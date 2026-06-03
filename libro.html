@@ -402,9 +402,9 @@ html,body{height:100%;background:var(--blk);color:var(--wh);font-family:'Lato',s
 #mapaFullscreen{
   display:none;position:fixed;inset:0;background:#050505;z-index:800;
 }
-#mapaFullscreen.show{display:block;}
+#mapaFullscreen.show{display:block;width:100%;height:100%;height:100dvh;}
 #mapaIframe{
-  width:100%;height:100%;border:none;display:block;
+  position:absolute;inset:0;width:100%;height:100%;border:none;display:block;
 }
 /* ══ INTRO DAYS ════════════════════════════════════ */
 .intro-badge{display:inline-block;font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:var(--blk);background:var(--g);padding:4px 12px;text-transform:uppercase;margin-bottom:14px;}
@@ -853,7 +853,13 @@ function openMapaFullscreen(){
   var mf=document.getElementById('mapaFullscreen');
   if(!mf) return;
   var iframe=document.getElementById('mapaIframe');
-  if(iframe && !iframe.src){iframe.src='mapa.html';}
+  if(iframe){
+    // Set src if not loaded yet
+    if(!iframe.getAttribute('data-loaded')){
+      iframe.src='mapa.html';
+      iframe.setAttribute('data-loaded','1');
+    }
+  }
   mf.classList.add('show');
   document.body.style.overflow='hidden';
 }
