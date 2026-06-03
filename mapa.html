@@ -158,7 +158,7 @@ html,body{width:100%;min-height:100vh;background:#050505;color:#d4cfc5;font-fami
 body { padding-top: 48px; }
 </style>
 <div class="app-back-btn">
-  <button onclick="window.parent.postMessage('closeMap','*')">&#8592; Volver</button>
+  <button onclick="localStorage.setItem('aef_mapa_close','1');window.history.back();">&#8592; Volver</button>
   <div class="map-title">Mapa del Proceso AEF</div>
 </div>
 <header class="hdr">

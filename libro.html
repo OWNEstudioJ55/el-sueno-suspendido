@@ -854,16 +854,25 @@ function openMapaFullscreen(){
   if(!mf) return;
   var iframe=document.getElementById('mapaIframe');
   if(iframe){
-    // Set src if not loaded yet
     if(!iframe.getAttribute('data-loaded')){
       iframe.src='mapa.html';
       iframe.setAttribute('data-loaded','1');
     }
   }
+  // Clear any previous close signal
+  localStorage.removeItem('aef_mapa_close');
   mf.classList.add('show');
   document.body.style.overflow='hidden';
+  // Poll localStorage for close signal from iframe
+  window._mapaPoller=setInterval(function(){
+    if(localStorage.getItem('aef_mapa_close')==='1'){
+      localStorage.removeItem('aef_mapa_close');
+      closeMapaFullscreen();
+    }
+  },200);
 }
 function closeMapaFullscreen(){
+  if(window._mapaPoller){clearInterval(window._mapaPoller);window._mapaPoller=null;}
   var mf=document.getElementById('mapaFullscreen');
   if(mf) mf.classList.remove('show');
   document.body.style.overflow='';
@@ -2090,13 +2099,7 @@ window.addEventListener('message',function(ev){
 });
 
 // ── MAP IFRAME CLOSE LISTENER ─────────────────────────────
-window.addEventListener('message', function(ev) {
-  if (ev.data === 'closeMap') {
-    var mf = document.getElementById('mapaFullscreen');
-    if (mf) mf.classList.remove('show');
-    document.body.style.overflow = '';
-  }
-});
+
 </script>
 </body>
 </html>
