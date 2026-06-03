@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Camino — Mapa AEF</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;min-height:100vh;background:#050505;color:#d4cfc5;font-family:'Cormorant Garamond',serif;overflow-x:hidden;}
+
+/* ── HEADER ── */
+.hdr{text-align:center;padding:48px 24px 36px;}
+.hdr-brand{font-family:'Cinzel',serif;font-size:9px;letter-spacing:5px;color:#5a4820;text-transform:uppercase;margin-bottom:12px;}
+.hdr-title{font-family:'Cinzel',serif;font-size:clamp(20px,3.5vw,34px);font-weight:700;color:#b89552;letter-spacing:2px;margin-bottom:10px;line-height:1.2;}
+.hdr-sub{font-size:16px;font-style:italic;color:#7a756a;margin-bottom:20px;}
+.hdr-intro{max-width:580px;margin:0 auto;font-size:15px;color:#9a9080;line-height:1.8;text-align:center;}
+.hdr-intro strong{color:#c4b898;font-style:normal;}
+.divider{width:180px;height:1px;background:linear-gradient(to right,transparent,#b89552,transparent);margin:24px auto 0;}
+
+/* ── INSTRUCTION PILL ── */
+.instruction{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  max-width:420px;margin:24px auto 0;
+  padding:12px 20px;
+  border:1px solid rgba(184,149,82,0.2);background:rgba(184,149,82,0.04);
+  font-size:13px;color:#7a6840;font-style:italic;
+}
+.instruction::before{content:'◈';color:#b89552;font-size:16px;}
+
+/* ── MAP WRAP ── */
+.map-outer{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:16px 0 20px;position:relative;}
+.map-svg{display:block;margin:0 auto;width:100%;min-width:700px;height:auto;}
+
+/* ── TOOLTIP ── */
+.tooltip{
+  position:fixed;
+  max-width:320px;min-width:240px;
+  background:#0e0c08;
+  border:1px solid rgba(184,149,82,0.5);
+  padding:0;
+  pointer-events:none;
+  z-index:9999;
+  opacity:0;
+  transition:opacity 0.18s;
+  box-shadow:0 8px 40px rgba(0,0,0,0.7);
+}
+.tooltip.visible{opacity:1;}
+.tt-header{padding:14px 18px 10px;border-bottom:1px solid rgba(184,149,82,0.15);}
+.tt-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;}
+.tt-title{font-family:'Cinzel',serif;font-size:15px;font-weight:600;line-height:1.2;}
+.tt-body{padding:12px 18px 8px;font-size:13px;line-height:1.7;color:#a09880;}
+.tt-body p{margin-bottom:8px;}
+.tt-body p:last-child{margin-bottom:0;}
+.tt-body strong{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.5px;display:block;margin-bottom:2px;}
+.tt-question{padding:10px 18px 14px;border-top:1px solid rgba(184,149,82,0.1);font-size:13px;font-style:italic;color:#8a7050;line-height:1.55;}
+.tt-question::before{content:'→ ';color:#b89552;}
+.tt-click{padding:6px 18px 12px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#4a3a20;text-transform:uppercase;}
+
+/* ── DETAIL DRAWER ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;cursor:pointer;}
+.drawer-overlay.open{display:block;}
+.drawer{
+  position:fixed;bottom:0;left:0;right:0;
+  max-height:75vh;overflow-y:auto;
+  background:#0e0c08;
+  border-top:1px solid rgba(184,149,82,0.4);
+  z-index:1001;
+  transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(.22,.68,0,1.2);
+  padding:32px 28px 48px;
+}
+.drawer.open{transform:translateY(0);}
+.drawer-close{
+  position:absolute;top:18px;right:20px;
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;
+  padding:6px 14px;border:1px solid rgba(184,149,82,0.3);
+  background:transparent;color:#7a6030;cursor:pointer;text-transform:uppercase;
+}
+.drawer-close:hover{border-color:#b89552;color:#b89552;}
+.dr-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:#5a4020;text-transform:uppercase;margin-bottom:6px;}
+.dr-title{font-family:'Cinzel',serif;font-size:clamp(18px,3vw,26px);font-weight:600;margin-bottom:6px;line-height:1.2;}
+.dr-tagline{font-size:15px;font-style:italic;color:#7a6840;margin-bottom:20px;line-height:1.5;}
+.dr-divider{height:1px;background:linear-gradient(to right,rgba(184,149,82,0.3),transparent);margin-bottom:20px;}
+.dr-body{font-size:15px;color:#a09880;line-height:1.8;margin-bottom:16px;}
+.dr-body p{margin-bottom:14px;}
+.dr-body p:last-child{margin-bottom:0;}
+.dr-items{display:flex;flex-direction:column;gap:10px;margin:16px 0;}
+.dr-item{display:flex;gap:14px;align-items:flex-start;padding:12px 16px;background:rgba(0,0,0,0.4);border-left:2px solid;}
+.dr-item-n{font-family:'Cinzel',serif;font-size:12px;font-weight:600;min-width:22px;flex-shrink:0;margin-top:2px;}
+.dr-item-t{font-size:14px;color:#9a8a70;line-height:1.6;}
+.dr-item-t strong{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.5px;display:block;margin-bottom:3px;}
+.dr-quote{border-left:3px solid;padding-left:16px;font-style:italic;font-size:16px;color:#8a7a5a;margin:18px 0;line-height:1.65;}
+.dr-ex{background:rgba(184,149,82,0.04);border:1px solid rgba(184,149,82,0.15);padding:18px 20px;margin-top:16px;}
+.dr-ex-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:#7a6030;text-transform:uppercase;margin-bottom:10px;}
+.dr-ex-body{font-size:14px;color:#8a7a60;line-height:1.7;}
+.dr-next{margin-top:20px;padding:16px 18px;background:rgba(90,170,128,0.05);border:1px solid rgba(90,170,128,0.2);}
+.dr-next-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#3a6050;text-transform:uppercase;margin-bottom:8px;}
+.dr-next-text{font-size:14px;color:#5a8a70;line-height:1.65;}
+.dr-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:14px 0;}
+.dr-col{padding:12px 14px;background:rgba(0,0,0,0.3);border-left:2px solid;}
+.dr-col-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.5px;margin-bottom:5px;}
+.dr-col-body{font-size:13px;color:#7a6a50;line-height:1.55;}
+
+/* ── BOTTOM LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;max-width:700px;margin:16px auto 40px;padding:0 20px;}
+.leg{display:flex;align-items:center;gap:7px;font-size:12px;color:#5a5040;}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.leg-line{width:24px;height:2px;flex-shrink:0;}
+.leg-dash{width:24px;height:2px;background:repeating-linear-gradient(to right,#8b3a3a 0,#8b3a3a 5px,transparent 5px,transparent 9px);flex-shrink:0;}
+
+/* ── FOOTER ── */
+.ftr{text-align:center;padding:24px 20px 44px;border-top:1px solid rgba(184,149,82,0.1);font-size:12px;color:#2a2520;font-style:italic;letter-spacing:1px;}
+.ftr strong{color:#5a4820;font-style:normal;}
+
+/* SVG cursor */
+.clickable{cursor:pointer;}
+</style>
+</head>
+<body>
+
+
+<style>
+.app-back-btn {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 48px;
+  background: rgba(6,6,6,.97);
+  border-bottom: 1px solid rgba(184,149,82,.2);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  z-index: 99999;
+  font-family: 'Cinzel', serif;
+}
+.app-back-btn button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #C9A84C;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0;
+}
+.app-back-btn .map-title {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(122,95,40,.7);
+  text-transform: uppercase;
+}
+body { padding-top: 48px; }
+</style>
+<div class="app-back-btn">
+  <button onclick="window.parent.postMessage('closeMap','*')">&#8592; Volver</button>
+  <div class="map-title">Mapa del Proceso AEF</div>
+</div>
+<header class="hdr">
+  <div class="hdr-brand">Arquitectura de Identidad · El Sueño Suspendido</div>
+  <h1 class="hdr-title">¿Dónde estoy en mi camino?</h1>
+  <p class="hdr-sub">El mapa de tu vida — desde el evento que te desvió hasta el Yo que podés ser</p>
+  <p class="hdr-intro">
+    <strong>Todos tenemos un camino natural.</strong> En algún momento algo lo interrumpió. Este mapa muestra ese desvío, cómo se sostiene, y el camino de vuelta. Pasá el mouse por cada parte del mapa para entender dónde estás. Hacé clic para leer más.
+  </p>
+  <div class="divider"></div>
+  <div class="instruction">Pasá el mouse por cada parte del mapa · Hacé clic para abrir</div>
+</header>
+
+<!-- ════ SVG MAP ════ -->
+<div class="map-outer">
+<svg class="map-svg" viewBox="0 0 1300 620" xmlns="http://www.w3.org/2000/svg" font-family="'Cormorant Garamond',serif">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="50%" r="55%">
+    <stop offset="0%" stop-color="#111008"/>
+    <stop offset="100%" stop-color="#050505"/>
+  </radialGradient>
+  <filter id="gl" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="glbig" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="river-g" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#1a3060" stop-opacity="0.5"/>
+    <stop offset="60%" stop-color="#2a4a8a" stop-opacity="0.4"/>
+    <stop offset="100%" stop-color="#b89552" stop-opacity="0.6"/>
+  </linearGradient>
+  <marker id="arr-b" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1.5L7 4L1 6.5" fill="none" stroke="#2a4a8a" stroke-width="1.5" stroke-linecap="round"/>
+  </marker>
+  <marker id="arr-r" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1.5L7 4L1 6.5" fill="none" stroke="#8b3a3a" stroke-width="1.5" stroke-linecap="round"/>
+  </marker>
+  <marker id="arr-g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M1 1.5L7 4L1 6.5" fill="none" stroke="#3a8060" stroke-width="1.5" stroke-linecap="round"/>
+  </marker>
+</defs>
+
+<rect width="1300" height="620" fill="url(#bg)"/>
+
+<!-- ═══ TIMELINE TICKS ═══ -->
+<line x1="80" y1="50" x2="80" y2="570" stroke="rgba(184,149,82,0.05)" stroke-width="1"/>
+<line x1="280" y1="50" x2="280" y2="570" stroke="rgba(184,149,82,0.05)" stroke-width="1"/>
+<line x1="480" y1="50" x2="480" y2="570" stroke="rgba(184,149,82,0.05)" stroke-width="1"/>
+<line x1="700" y1="50" x2="700" y2="570" stroke="rgba(184,149,82,0.05)" stroke-width="1"/>
+<line x1="880" y1="50" x2="880" y2="570" stroke="rgba(184,149,82,0.05)" stroke-width="1"/>
+<line x1="1060" y1="50" x2="1060" y2="570" stroke="rgba(184,149,82,0.05)" stroke-width="1"/>
+<line x1="1220" y1="50" x2="1220" y2="570" stroke="rgba(184,149,82,0.05)" stroke-width="1"/>
+
+<!-- Time labels -->
+<text x="80" y="44" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a2518">NACIMIENTO</text>
+<text x="280" y="44" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a2518">NIÑEZ</text>
+<text x="480" y="44" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a2518">ADOLESCENCIA</text>
+<text x="700" y="44" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a2518">ADULTEZ</text>
+<text x="880" y="44" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a2518">HOY</text>
+<text x="1060" y="44" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a2518">EL PROCESO</text>
+<text x="1220" y="44" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#7a5f28">YO FUTURO</text>
+
+<!-- ═══ RIVER BAND (flujo ideal) ═══ -->
+<path d="M60 270 Q200 265 280 272 Q400 280 480 276 Q620 272 700 276 Q800 280 880 276 Q980 272 1060 270 Q1160 268 1220 265 L1280 265 L1280 310 Q1160 312 1060 314 Q980 316 880 314 Q800 312 700 314 Q620 316 480 314 Q400 310 280 304 Q200 300 60 306 Z"
+  fill="url(#river-g)" opacity="0.15"/>
+
+<!-- River center line -->
+<path d="M60 288 Q200 283 280 288 Q400 295 480 291 Q620 286 700 290 Q800 294 880 290 Q980 287 1060 284 Q1160 281 1220 278"
+  fill="none" stroke="#2a4a8a" stroke-width="3.5" opacity="0.55" stroke-linecap="round" marker-end="url(#arr-b)"/>
+
+<!-- River label -->
+<text x="400" y="270" font-family="'Cormorant Garamond',serif" font-size="12" font-style="italic" fill="#2a4060" opacity="0.6">tu camino natural · tu sueño · tu potencial</text>
+
+<!-- ═══ ORIGIN NODE ═══ -->
+<g class="clickable" onmouseenter="showTip(event,'origin')" onmouseleave="hideTip()" onclick="openDrawer('origin')">
+  <circle cx="80" cy="288" r="14" fill="#0a1020" stroke="#2a5080" stroke-width="2"/>
+  <text x="80" y="293" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" fill="#2a5080">●</text>
+</g>
+<text x="80" y="312" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="11" font-style="italic" fill="#1e3050">naciste completo</text>
+
+<!-- ═══ EVENT NODE (niñez) ═══ -->
+<g class="clickable" filter="url(#gl)" onmouseenter="showTip(event,'evento')" onmouseleave="hideTip()" onclick="openDrawer('evento')">
+  <circle cx="300" cy="288" r="18" fill="#200808" stroke="#c4784a" stroke-width="2.5"/>
+  <text x="300" y="295" text-anchor="middle" font-family="'Cinzel',serif" font-size="16" font-weight="700" fill="#c4784a">!</text>
+</g>
+<!-- Event label -->
+<rect x="240" y="255" width="120" height="24" rx="2" fill="rgba(196,120,74,0.08)" stroke="rgba(196,120,74,0.25)" stroke-width="1"/>
+<text x="300" y="271" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#c4784a">EL EVENTO</text>
+
+<!-- ═══ AEF DESVÍO PATH ═══ -->
+<!-- The deviation arc — goes down, stays down, comes back up via healing -->
+<path d="M318 300 Q360 360 420 420 Q500 490 600 510 Q680 522 760 512 Q830 500 870 470 Q880 460 882 420"
+  fill="none" stroke="#8b3a3a" stroke-width="2.5" stroke-dasharray="10,6" opacity="0.75" marker-end="url(#arr-r)"/>
+
+<!-- Second event (deeper layer) — optional -->
+<g class="clickable" onmouseenter="showTip(event,'tapón')" onmouseleave="hideTip()" onclick="openDrawer('tapón')">
+  <circle cx="490" cy="360" r="12" fill="#180606" stroke="#9a5050" stroke-width="1.5" opacity="0.85"/>
+  <text x="490" y="365" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" fill="#9a5050">!</text>
+</g>
+<text x="490" y="348" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#6a3020" opacity="0.8">capa más</text>
+<text x="490" y="338" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#6a3020" opacity="0.8">profunda</text>
+
+<!-- ═══ MASKS ALONG THE PATH ═══ -->
+<!-- Mask 1: Procrastinador -->
+<g class="clickable" onmouseenter="showTip(event,'proc')" onmouseleave="hideTip()" onclick="openDrawer('mascaras')">
+  <rect x="336" y="342" width="108" height="32" rx="2" fill="#140808" stroke="#7a3020" stroke-width="1"/>
+  <text x="390" y="356" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#9a4030">POSTERGO</text>
+  <text x="390" y="368" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="10" font-style="italic" fill="#5a2818">todo lo importante</text>
+</g>
+
+<!-- Mask 2: Autosaboteador -->
+<g class="clickable" onmouseenter="showTip(event,'auto')" onmouseleave="hideTip()" onclick="openDrawer('mascaras')">
+  <rect x="438" y="430" width="120" height="32" rx="2" fill="#140808" stroke="#7a3020" stroke-width="1"/>
+  <text x="498" y="444" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#9a4030">ME DESTRUYO</text>
+  <text x="498" y="456" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="10" font-style="italic" fill="#5a2818">antes de llegar</text>
+</g>
+
+<!-- Mask 3: Perfeccionista -->
+<g class="clickable" onmouseenter="showTip(event,'perf')" onmouseleave="hideTip()" onclick="openDrawer('mascaras')">
+  <rect x="555" y="490" width="118" height="32" rx="2" fill="#140808" stroke="#7a3020" stroke-width="1"/>
+  <text x="614" y="504" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#9a4030">NUNCA TERMINO</text>
+  <text x="614" y="516" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="10" font-style="italic" fill="#5a2818">porque podría ser juzgado</text>
+</g>
+
+<!-- Mask 4: Hipercrítico -->
+<g class="clickable" onmouseenter="showTip(event,'hiper')" onmouseleave="hideTip()" onclick="openDrawer('mascaras')">
+  <rect x="672" y="484" width="120" height="32" rx="2" fill="#140808" stroke="#7a3020" stroke-width="1"/>
+  <text x="732" y="498" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#9a4030">ME ATACO PRIMERO</text>
+  <text x="732" y="510" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="10" font-style="italic" fill="#5a2818">antes de que otros lo hagan</text>
+</g>
+
+<!-- Mask 5: Evasivo -->
+<g class="clickable" onmouseenter="showTip(event,'evasivo')" onmouseleave="hideTip()" onclick="openDrawer('mascaras')">
+  <rect x="784" y="454" width="100" height="32" rx="2" fill="#140808" stroke="#7a3020" stroke-width="1"/>
+  <text x="834" y="468" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#9a4030">ME ALEJO</text>
+  <text x="834" y="480" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="10" font-style="italic" fill="#5a2818">cuando algo me importa</text>
+</g>
+
+<!-- ═══ CICLO DEL BLOQUEO ═══ -->
+<g class="clickable" filter="url(#gl)" onmouseenter="showTip(event,'ciclo')" onmouseleave="hideTip()" onclick="openDrawer('ciclo')">
+  <ellipse cx="600" cy="445" rx="58" ry="26" fill="#140808" stroke="#8b3a3a" stroke-width="1.5"/>
+  <!-- cycle arrows inside -->
+  <path d="M558 436 Q555 425 568 422 Q582 420 590 430" fill="none" stroke="#7a3030" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>
+  <path d="M644 452 Q648 464 634 468 Q618 470 610 460" fill="none" stroke="#7a3030" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>
+  <text x="600" y="440" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#c06060">EL CICLO</text>
+  <text x="600" y="454" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#c06060">DEL BLOQUEO</text>
+</g>
+
+<!-- ═══ "HOY" MARKER ═══ -->
+<rect x="860" y="258" width="40" height="20" rx="2" fill="rgba(184,149,82,0.07)" stroke="rgba(184,149,82,0.25)" stroke-width="1"/>
+<text x="880" y="272" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#7a6030">HOY</text>
+<line x1="880" y1="278" x2="880" y2="290" stroke="rgba(184,149,82,0.25)" stroke-width="1" stroke-dasharray="3,3"/>
+
+<!-- AEF zone label -->
+<rect x="285" y="530" width="430" height="50" rx="2" fill="rgba(20,6,6,0.85)" stroke="rgba(139,58,58,0.2)" stroke-width="1"/>
+<text x="500" y="552" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#5a2510">TERRITORIO DEL AEF</text>
+<text x="500" y="568" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="12" font-style="italic" fill="#3a1a0a">"los muros que te protegieron, ahora te encierran" — hay una salida</text>
+
+<!-- ═══ RECONNECT ARC — return journey ═══ -->
+<path d="M882 430 Q890 400 900 380 Q910 355 930 330 Q950 308 980 298 Q1010 290 1040 290"
+  fill="none" stroke="#3a8060" stroke-width="2.5" opacity="0.7" marker-end="url(#arr-g)"/>
+
+<!-- ═══ PILAR 1: RECONOCIMIENTO ═══ -->
+<g class="clickable" filter="url(#gl)" onmouseenter="showTip(event,'recon')" onmouseleave="hideTip()" onclick="openDrawer('recon')">
+  <circle cx="900" cy="390" r="22" fill="#08140e" stroke="#3a8060" stroke-width="2"/>
+  <text x="900" y="386" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#5aaa80">P1</text>
+  <text x="900" y="398" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" fill="#5aaa80">VER</text>
+</g>
+<text x="900" y="424" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="12" font-style="italic" fill="#3a6050">Reconocimiento</text>
+
+<!-- ═══ PILAR 2: DIÁLOGO ═══ -->
+<g class="clickable" filter="url(#gl)" onmouseenter="showTip(event,'dialogo')" onmouseleave="hideTip()" onclick="openDrawer('dialogo')">
+  <circle cx="980" cy="335" r="22" fill="#08140e" stroke="#3a8060" stroke-width="2"/>
+  <text x="980" y="331" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#5aaa80">P2</text>
+  <text x="980" y="343" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" fill="#5aaa80">OÍR</text>
+</g>
+<text x="980" y="368" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="12" font-style="italic" fill="#3a6050">Diálogo</text>
+<line x1="920" y1="374" x2="960" y2="350" stroke="#3a8060" stroke-width="1.8" opacity="0.6" marker-end="url(#arr-g)"/>
+
+<!-- ═══ PILAR 3: SANACIÓN (TV) ═══ -->
+<g class="clickable" filter="url(#gl)" onmouseenter="showTip(event,'sanacion')" onmouseleave="hideTip()" onclick="openDrawer('sanacion')">
+  <circle cx="1060" cy="295" r="22" fill="#08140e" stroke="#3a8060" stroke-width="2"/>
+  <text x="1060" y="291" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#5aaa80">P3</text>
+  <text x="1060" y="303" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" fill="#5aaa80">SANAR</text>
+</g>
+<text x="1060" y="328" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="12" font-style="italic" fill="#3a6050">Sanación</text>
+<line x1="1000" y1="320" x2="1040" y2="308" stroke="#3a8060" stroke-width="1.8" opacity="0.6" marker-end="url(#arr-g)"/>
+
+<!-- River merge after healing -->
+<path d="M1080 288 Q1120 284 1150 284"
+  fill="none" stroke="#3a8060" stroke-width="2" opacity="0.5" marker-end="url(#arr-g)"/>
+
+<!-- ═══ PILAR 4: INTEGRACIÓN — back on river ═══ -->
+<g class="clickable" filter="url(#gl)" onmouseenter="showTip(event,'integracion')" onmouseleave="hideTip()" onclick="openDrawer('integracion')">
+  <circle cx="1155" cy="284" r="24" fill="#0a1a0e" stroke="#5aaa80" stroke-width="2.5"/>
+  <text x="1155" y="280" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="1" fill="#7acc98">P4</text>
+  <text x="1155" y="292" text-anchor="middle" font-family="'Cinzel',serif" font-size="8" fill="#7acc98">INTEGRAR</text>
+</g>
+<text x="1155" y="258" text-anchor="middle" font-family="'Cinzel',serif" font-size="10" letter-spacing="1" fill="#4a9070">DE VUELTA</text>
+<text x="1155" y="246" text-anchor="middle" font-family="'Cinzel',serif" font-size="10" letter-spacing="1" fill="#4a9070">AL CAMINO</text>
+<line x1="1000" y1="284" x2="1133" y2="284" stroke="#3a8060" stroke-width="1" opacity="0.2" stroke-dasharray="3,5"/>
+
+<!-- ═══ YO FUTURO ═══ -->
+<g class="clickable" filter="url(#glbig)" onmouseenter="showTip(event,'futuro')" onmouseleave="hideTip()" onclick="openDrawer('futuro')">
+  <circle cx="1220" cy="278" r="34" fill="#181408" stroke="#b89552" stroke-width="2.5"/>
+  <circle cx="1220" cy="278" r="26" fill="#1c1608" stroke="#b89552" stroke-width="1" opacity="0.4"/>
+</g>
+<text x="1220" y="273" text-anchor="middle" font-family="'Cinzel',serif" font-size="12" font-weight="700" letter-spacing="1" fill="#b89552">YO</text>
+<text x="1220" y="287" text-anchor="middle" font-family="'Cinzel',serif" font-size="12" font-weight="700" letter-spacing="1" fill="#b89552">FUTURO</text>
+<circle cx="1220" cy="278" r="44" fill="none" stroke="#b89552" stroke-width="0.5" opacity="0.2"/>
+<circle cx="1220" cy="278" r="56" fill="none" stroke="#b89552" stroke-width="0.3" opacity="0.1"/>
+<!-- Connect P4 to YF -->
+<line x1="1179" y1="278" x2="1185" y2="278" stroke="#b89552" stroke-width="1.5" opacity="0.4"/>
+
+<!-- 5 dimensions rays -->
+<line x1="1248" y1="256" x2="1270" y2="232" stroke="#7a6030" stroke-width="0.8" opacity="0.4"/>
+<text x="1272" y="229" font-family="'Cinzel',serif" font-size="8" fill="#6a5028" letter-spacing="1">Actúo aunque tenga miedo</text>
+<line x1="1254" y1="278" x2="1278" y2="278" stroke="#7a6030" stroke-width="0.8" opacity="0.4"/>
+<text x="1280" y="282" font-family="'Cinzel',serif" font-size="8" fill="#6a5028" letter-spacing="1">Tolero no saber</text>
+<line x1="1248" y1="300" x2="1270" y2="318" stroke="#7a6030" stroke-width="0.8" opacity="0.4"/>
+<text x="1272" y="322" font-family="'Cinzel',serif" font-size="8" fill="#6a5028" letter-spacing="1">Disfruto el camino</text>
+<line x1="1228" y1="312" x2="1228" y2="334" stroke="#7a6030" stroke-width="0.8" opacity="0.4"/>
+<text x="1228" y="347" text-anchor="middle" font-family="'Cinzel',serif" font-size="8" fill="#6a5028" letter-spacing="1">Soy coherente</text>
+<line x1="1192" y1="298" x2="1170" y2="318" stroke="#7a6030" stroke-width="0.8" opacity="0.4"/>
+<text x="1166" y="330" text-anchor="end" font-family="'Cinzel',serif" font-size="8" fill="#6a5028" letter-spacing="1">AEF aliado</text>
+
+<!-- ═══ PATH RETURN LABEL ═══ -->
+<text x="980" y="272" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a4a38">EL CAMINO</text>
+<text x="980" y="260" text-anchor="middle" font-family="'Cinzel',serif" font-size="9" letter-spacing="2" fill="#2a4a38">DE REGRESO</text>
+
+</svg>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="leg"><div class="leg-line" style="background:#2a4a8a;"></div>Tu camino natural</div>
+  <div class="leg"><div class="leg-dash"></div>Desvío del AEF</div>
+  <div class="leg"><div class="leg-dot" style="background:#c4784a;"></div>Evento que formó el AEF</div>
+  <div class="leg"><div class="leg-dot" style="background:#5aaa80;"></div>Pasos de regreso</div>
+  <div class="leg"><div class="leg-dot" style="background:#b89552;"></div>Yo Futuro</div>
+</div>
+
+<!-- ════ TOOLTIP ════ -->
+<div class="tooltip" id="tooltip">
+  <div class="tt-header">
+    <div class="tt-label" id="tt-label"></div>
+    <div class="tt-title" id="tt-title"></div>
+  </div>
+  <div class="tt-body" id="tt-body"></div>
+  <div class="tt-question" id="tt-question"></div>
+  <div class="tt-click">Hacé clic para leer más →</div>
+</div>
+
+<!-- ════ DETAIL DRAWER ════ -->
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕ Cerrar</button>
+  <div id="drawer-content"></div>
+</div>
+
+<footer class="ftr">
+  <strong>Arquitectura de Identidad · @elsuenosuspendido</strong><br><br>
+  "El AEF esperó mucho tiempo para ser visto. Ya no tiene que seguir esperando."
+</footer>
+
+<script>
+// ── TOOLTIP DATA ──
+const tips = {
+  origin: {
+    label:'El punto de partida',
+    title:'Naciste con todo lo que necesitás',
+    body:'<p>Antes de cualquier herida, antes de cualquier miedo aprendido, eras puro potencial. Ese potencial sigue ahí. El trabajo del AEF no es crear algo nuevo — es despejar lo que lo tapa.</p>',
+    q:'¿Podés recordar algún momento de tu infancia donde te sentiste libre, sin el peso de lo que vino después?'
+  },
+  evento: {
+    label:'Cap. 1 — El evento formador',
+    title:'El momento en que algo se cerró',
+    body:'<p>En algún punto de tu historia, algo pasó. No siempre fue dramático. A veces fue una mirada de decepción, una burla, una promesa rota. Lo que importa no es lo que pasó, sino <strong>la conclusión que sacaste de eso.</strong></p><p>Esa conclusión — "no soy suficiente", "si me ven me lastiman", "el éxito es peligroso" — sigue tomando decisiones por vos hoy.</p>',
+    q:'¿Cuándo fue la primera vez que sentiste que era mejor no avanzar, no mostrarte, no intentarlo?'
+  },
+  tapón: {
+    label:'Cap. 2 — Las capas del AEF',
+    title:'A veces hay más debajo',
+    body:'<p>El primer evento que trabajás en el proceso a veces es un "tapón". Al resolverlo, aparece algo más profundo que estaba escondido debajo, esperando ser visto.</p><p>Esto no es fracaso del proceso. Es señal de que el proceso <strong>está funcionando.</strong> El sistema nervioso solo muestra lo que está listo para ser sanado.</p>',
+    q:'¿Hay algo en tu historia que sentís que nunca terminaste de mirar de frente?'
+  },
+  proc: {
+    label:'Máscara del AEF',
+    title:'"Postergo todo lo importante"',
+    body:'<p>La dilación no es pereza. Es protección. Si no intentás, no podés fallar. El AEF aprendió que avanzar traía dolor, así que inventó mil razones para esperar el "momento perfecto".</p><p>El momento perfecto nunca llega. Porque no es eso lo que está en juego.</p>',
+    q:'¿Cuánto tiempo llevas postergando algo que sabés que importa?'
+  },
+  auto: {
+    label:'Máscara del AEF',
+    title:'"Me destruyo justo antes de llegar"',
+    body:'<p>El autosaboteador destruye lo que construye cuando el éxito está al alcance. ¿Por qué? Porque el AEF aprendió que el éxito también duele — trae crítica, expectativa, pérdida.</p><p>Prefiere el fracaso conocido a la incertidumbre desconocida del éxito.</p>',
+    q:'¿Hay algo que empezaste con fuerza y abandonaste justo cuando estaba por funcionar?'
+  },
+  perf: {
+    label:'Máscara del AEF',
+    title:'"Nunca termino porque podría ser juzgado"',
+    body:'<p>El perfeccionismo no es un estándar alto. Es miedo. Si nunca terminás, nunca podés ser juzgado. Si siempre hay algo más que corregir, siempre tenés una excusa para no mostrarte.</p><p>El perfeccionismo es miedo con buenas intenciones.</p>',
+    q:'¿Hay algo que "no está listo todavía" que en realidad sí podría salir al mundo?'
+  },
+  hiper: {
+    label:'Máscara del AEF',
+    title:'"Me ataco antes de que otros lo hagan"',
+    body:'<p>La voz que dice "quién te creés que sos", "tarde o temprano te van a descubrir", "no sos suficiente" — no es tu voz. Es el eco de voces externas que el AEF internalizó para protegerte del golpe externo.</p><p>Si te achicás vos primero, nadie puede achicarte más.</p>',
+    q:'¿Qué cosas te decís a vos mismo que no le dirías a alguien que querés?'
+  },
+  evasivo: {
+    label:'Máscara del AEF',
+    title:'"Me alejo cuando algo me importa"',
+    body:'<p>El AEF aprendió que acercarse demasiado es arriesgarse a perder. Entonces construyó muros que parecen independencia pero en realidad son protección contra el abandono.</p><p>La distancia duele menos que ser abandonado. Eso fue verdad alguna vez. ¿Lo sigue siendo hoy?</p>',
+    q:'¿Hay alguien o algo de lo que te alejaste justo cuando empezaba a importarte de verdad?'
+  },
+  ciclo: {
+    label:'Cap. 2 — El mecanismo',
+    title:'El ciclo que se alimenta solo',
+    body:'<p>El bloqueo no es un estado: es un proceso. Algo te activa → el cuerpo entra en alerta → el AEF decide por vos → te bloqueás → te juzgás → el AEF se confirma.</p><p>Y así otra vez. Y otra. El ciclo se retroalimenta porque la vergüenza es el mejor fertilizante para el AEF.</p>',
+    q:'¿Reconocés este ciclo en tu propia vida? ¿En qué área se repite más seguido?'
+  },
+  recon: {
+    label:'Pilar 1 del Método AEF',
+    title:'Ver al AEF es el primer paso',
+    body:'<p>No podés sanar lo que no podés ver. El reconocimiento no es un momento dramático — es una práctica cotidiana de aprender a identificar al AEF en tiempo real, en el cuerpo, en los pensamientos.</p><p>Cada vez que lo ves antes de que decida por vos, recuperás un poco de tu propia vida.</p>',
+    q:'¿Podés reconocer cuándo el AEF está hablando, o solo te das cuenta después?'
+  },
+  dialogo: {
+    label:'Pilar 2 del Método AEF',
+    title:'Hablarle y escuchar lo que responde',
+    body:'<p>El AEF no habla en palabras abstractas. Habla en imágenes, sensaciones, emociones. Cuando aprendés su idioma y le preguntás "¿qué estás protegiendo?", empieza a comunicarse de otra manera — con menos intensidad, con más claridad.</p><p>No es tu enemigo. Es un guardián que nunca supo que la guerra terminó.</p>',
+    q:'Si el AEF pudiera hablarte directamente, ¿qué creés que te diría que necesita?'
+  },
+  sanacion: {
+    label:'Pilar 3 — La Pantalla de TV',
+    title:'Volver a la escena para darle lo que faltó',
+    body:'<p>La técnica central del método: visualizás la escena del pasado en una pantalla, desde la seguridad del presente. Sos el director. Podés introducir un aliado — alguien o algo que le dé al niño de esa escena lo que no tuvo.</p><p>No borrás lo que ocurrió. Cambiás cómo tu sistema nervioso siente lo que ocurrió. Eso es posible. La neurociencia lo llama reconsolidación.</p>',
+    q:'¿Qué necesitaba el niño que eras en ese momento que nadie le dio?'
+  },
+  integracion: {
+    label:'Pilar 4 del Método AEF',
+    title:'De vuelta al camino — y sostenerlo',
+    body:'<p>La integración no es un gran momento. Son microacciones cotidianas: pequeñas cosas que el Yo Futuro haría y que elegís hacer hoy, a pesar del AEF. Cada acción es evidencia para el sistema nervioso de que el mundo puede vivirse diferente.</p><p>No es lo que hacés una vez. Es lo que hacés todos los días.</p>',
+    q:'¿Cuál sería la acción más pequeña que podrías tomar hoy en dirección al Yo Futuro?'
+  },
+  futuro: {
+    label:'Cap. 4 — El Futuro Logrado',
+    title:'La versión de vos que ya podés ser',
+    body:'<p>El Yo Futuro no es perfecto. No tiene todo resuelto. Es la versión de vos que actúa desde la confianza en lugar del miedo, que puede sostener el error sin derrumbarse, que siente alegría genuina en el proceso.</p><p>La diferencia no es de información. Es de estado interno. Y ese estado se aprende, se practica y se construye.</p>',
+    q:'Si el AEF ya no tomara las decisiones por vos, ¿qué harías diferente mañana?'
+  }
+};
+
+// ── DRAWER DATA ──
+const drawers = {
+  origin: {
+    color:'#2a5080', label:'El punto de partida',
+    title:'Naciste con todo lo que necesitás',
+    tagline:'El potencial no desaparece. Solo queda cubierto.',
+    content:`
+      <div class="dr-body">
+        <p>Antes del primer evento que cerró algo en vos, existía un flujo. Una apertura natural al mundo, una curiosidad sin filtros, una energía que se movía sin frenos internos.</p>
+        <p>El trabajo del Método AEF no es crear algo nuevo desde cero. Es despejar el camino para que lo que siempre estuvo ahí pueda volver a moverse.</p>
+        <p>El libro usa la imagen del río: tu energía vital es como un río con una naturaleza propia. El AEF es un dique levantado en la infancia. El dique cumplió su función. El problema es que los diques no saben cuándo la crisis pasó.</p>
+      </div>
+      <div class="dr-quote" style="border-color:#2a5080">"La sanación no es destruir el dique de golpe. Es aprender a abrir las compuertas, gradualmente, permitiendo que el río fluya."</div>
+      <div class="dr-next">
+        <div class="dr-next-label">Para reflexionar</div>
+        <div class="dr-next-text">¿Podés recordar algún momento — de la infancia, de cuando eras muy chico — donde te sentiste libre, sin el peso de lo que vino después? Ese momento es una puerta de entrada al Yo Futuro que ya existía.</div>
+      </div>
+    `
+  },
+  evento: {
+    color:'#c4784a', label:'Cap. 1 — El Rostro del Fracaso',
+    title:'El Evento que Formó al AEF',
+    tagline:'No importa su tamaño. Importa la conclusión que sacaste.',
+    content:`
+      <div class="dr-body">
+        <p>En algún momento de tu historia — en la niñez, en la adolescencia, a veces incluso antes — algo pasó. Puede haber sido una burla en el recreo, una mirada de decepción de un padre, una promesa rota, un fracaso delante de otros, o algo que para cualquier observador externo parecería insignificante.</p>
+        <p>Lo que importa no fue la magnitud del evento. Lo que importa fue la <strong>conclusión que el niño sacó de él</strong>. El sistema nervioso de un niño no tiene filtros filosóficos. Solo registra: <em>dolor — amenaza — evitar</em>. Y esa conclusión quedó grabada en el cuerpo mucho después de que la mente la archivó como pasado.</p>
+        <p>A esa conclusión el libro la llama creencia limitante. Puede sonar como: "no soy suficiente", "si me muestro me lastiman", "el éxito es peligroso", "no merezco que me vaya bien". Y desde ese momento, esa creencia opera como un sistema de navegación que toma decisiones por vos.</p>
+      </div>
+      <div class="dr-cols">
+        <div class="dr-col" style="border-color:#c4784a">
+          <div class="dr-col-title" style="color:#c4784a">Evento traumático</div>
+          <div class="dr-col-body">Un hecho de alta intensidad: abandono, violencia, pérdida, humillación pública. El sistema nervioso lo registra con intensidad máxima.</div>
+        </div>
+        <div class="dr-col" style="border-color:#c4784a">
+          <div class="dr-col-title" style="color:#c4784a">Evento aparentemente pequeño</div>
+          <div class="dr-col-body">Una corrección mal puesta, una comparación, un silencio que duró demasiado. Para afuera era nada. Para el niño, fue todo.</div>
+        </div>
+        <div class="dr-col" style="border-color:#c4784a">
+          <div class="dr-col-title" style="color:#c4784a">El tapón que esconde más</div>
+          <div class="dr-col-body">A veces el primer evento trabajado destapa otros más profundos que estaban escondidos debajo. No hay prisa.</div>
+        </div>
+      </div>
+      <div class="dr-quote" style="border-color:#c4784a">"A partir de ese momento, nació el Alter Ego Fracasado. No como tu enemigo — como tu protector más antiguo."</div>
+      <div class="dr-ex">
+        <div class="dr-ex-title">✦ Ejercicio — El Primer Encuentro</div>
+        <div class="dr-ex-body">Cerrá los ojos. Pensá en un bloqueo que se repite en tu vida. Preguntate: ¿cuándo fue la primera vez que sentí algo parecido a esto? Dejá que aparezca una escena, sin forzarla. ¿Cuántos años tenías? ¿Qué pasó? ¿Qué conclusión sacaste en ese momento sobre vos o sobre el mundo?</div>
+      </div>
+    `
+  },
+  tapón: {
+    color:'#9a5050', label:'Cap. 2 — Las capas del AEF',
+    title:'Las Capas Debajo de la Capa',
+    tagline:'El proceso respeta su propio ritmo. No hay prisa.',
+    content:`
+      <div class="dr-body">
+        <p>El AEF generalmente no tiene una sola herida. Tiene una constelación de heridas que forman un patrón. Al trabajar la primera escena, a veces aparece otra más profunda que estaba debajo, esperando condiciones de seguridad suficientes para ser vista.</p>
+        <p>Esto no es fracaso del proceso — es la señal más clara de que el proceso está funcionando. El sistema nervioso solo revela lo que está listo para ser sanado. Si aparece algo nuevo y más profundo, es porque ya confiás lo suficiente en el proceso como para sostenerlo.</p>
+      </div>
+      <div class="dr-quote" style="border-color:#9a5050">"Trabajar una escena a la vez, con paciencia y regularidad, va desactivando esa constelación de manera gradual."</div>
+      <div class="dr-next">
+        <div class="dr-next-label">Para tener en cuenta</div>
+        <div class="dr-next-text">Si en el proceso aparece algo que te supera emocionalmente, ese es exactamente el momento para buscar acompañamiento profesional. El libro y el autoconocimiento potencian el trabajo con un facilitador — no lo reemplazan.</div>
+      </div>
+    `
+  },
+  mascaras: {
+    color:'#d09050', label:'Cap. 1 — Las 7 máscaras',
+    title:'Las 7 Formas en que el AEF Se Esconde',
+    tagline:'Diferentes estrategias. El mismo origen: protegerte del dolor.',
+    content:`
+      <div class="dr-body">
+        <p>El AEF no siempre se presenta de la misma manera. A lo largo del tiempo desarrolla diferentes estrategias de protección. Lo más frecuente es que en una misma persona operen dos o tres de estas máscaras al mismo tiempo, según el contexto.</p>
+      </div>
+      <div class="dr-items">
+        <div class="dr-item" style="border-color:#d09050"><div class="dr-item-n" style="color:#d09050">1</div><div class="dr-item-t"><strong style="color:#d09050">El Procrastinador — "Ya lo hago después"</strong>Posterga lo importante para evitar el riesgo de fracasar. La dilación no es pereza: es protección disfrazada de tiempo. Si no intentás, no podés fallar.</div></div>
+        <div class="dr-item" style="border-color:#d09050"><div class="dr-item-n" style="color:#d09050">2</div><div class="dr-item-t"><strong style="color:#d09050">El Perfeccionista — "Todavía no está listo"</strong>Jamás termina porque terminado puede ser juzgado. El perfeccionismo es miedo con buenas intenciones. La perfección es la excusa para no mostrarse.</div></div>
+        <div class="dr-item" style="border-color:#d09050"><div class="dr-item-n" style="color:#d09050">3</div><div class="dr-item-t"><strong style="color:#d09050">El Autosaboteador — "Todo iba bien hasta que..."</strong>Destruye lo que construye justo antes de la línea de llegada. Prefiere el fracaso conocido a la incertidumbre desconocida del éxito.</div></div>
+        <div class="dr-item" style="border-color:#d09050"><div class="dr-item-n" style="color:#d09050">4</div><div class="dr-item-t"><strong style="color:#d09050">El Hipercrítico — "Quién me creí que era"</strong>Se ataca a sí mismo antes de que otros puedan hacerlo. Si te achicás primero, el golpe externo duele menos. Es anticipación del dolor que se vuelve producción constante de dolor.</div></div>
+        <div class="dr-item" style="border-color:#d09050"><div class="dr-item-n" style="color:#d09050">5</div><div class="dr-item-t"><strong style="color:#d09050">El Complaciente — "Sí a todo"</strong>Dice que sí a todo para evitar el conflicto que lo lastimó. La amabilidad sin límites como estrategia de supervivencia. No porque quiera — porque tiene miedo de lo que pasa si dice que no.</div></div>
+        <div class="dr-item" style="border-color:#d09050"><div class="dr-item-n" style="color:#d09050">6</div><div class="dr-item-t"><strong style="color:#d09050">El Controlador — "Tiene que ser como yo digo"</strong>Necesita controlar todo para no sentir la incertidumbre del pasado. El control como respuesta al caos que alguna vez fue real y que el cuerpo todavía recuerda.</div></div>
+        <div class="dr-item" style="border-color:#d09050"><div class="dr-item-n" style="color:#d09050">7</div><div class="dr-item-t"><strong style="color:#d09050">El Evasivo — "Necesito mi espacio"</strong>Desaparece emocionalmente cuando la intimidad empieza a crecer. La distancia como protección contra el abandono que siente inminente. Se va antes de que lo dejen.</div></div>
+      </div>
+      <div class="dr-quote" style="border-color:#d09050">"¿Cuál de estas máscaras reconocés en vos? ¿En qué contextos aparece con más fuerza? Esas respuestas son tu primer mapa del AEF personal."</div>
+    `
+  },
+  ciclo: {
+    color:'#c06060', label:'Cap. 2 — El mecanismo',
+    title:'El Ciclo del Bloqueo',
+    tagline:'Un proceso que se cierra y se refuerza a sí mismo — hasta que lo ves.',
+    content:`
+      <div class="dr-body">
+        <p>El bloqueo no es un estado en el que "sos así". Es un proceso que ocurre en tiempo real, con pasos identificables. Cuando empezás a verlo como proceso, podés intervenir en él. Cuando lo ves como identidad ("soy así"), no hay salida.</p>
+      </div>
+      <div class="dr-items">
+        <div class="dr-item" style="border-color:#c06060"><div class="dr-item-n" style="color:#c06060">1</div><div class="dr-item-t"><strong style="color:#c06060">Disparador</strong>Algo activa la memoria del dolor original. Puede ser una situación, una persona, una oportunidad real, o incluso algo positivo como el entusiasmo — que el AEF asocia con la decepción que vino después.</div></div>
+        <div class="dr-item" style="border-color:#c06060"><div class="dr-item-n" style="color:#c06060">2</div><div class="dr-item-t"><strong style="color:#c06060">Alarma en el cuerpo</strong>El sistema nervioso entra en modo amenaza antes de que la mente pueda procesar nada. Respiración superficial, estómago contraído, hombros subidos, garganta apretada. El cuerpo está "diciendo" algo.</div></div>
+        <div class="dr-item" style="border-color:#c06060"><div class="dr-item-n" style="color:#c06060">3</div><div class="dr-item-t"><strong style="color:#c06060">Decisión del AEF</strong>Evitar, postergar, minimizar o atacarse. Esta decisión ocurre antes de que la razón pueda intervenir. Es automática, rápida, y se siente como "la única opción".</div></div>
+        <div class="dr-item" style="border-color:#c06060"><div class="dr-item-n" style="color:#c06060">4</div><div class="dr-item-t"><strong style="color:#c06060">Comportamiento bloqueante</strong>Lo que se ve desde afuera: no mandás el mensaje, no abrís el archivo, no hacés el llamado, te quedás quieto. Procrastinación, autosabotaje, evasión.</div></div>
+        <div class="dr-item" style="border-color:#c06060"><div class="dr-item-n" style="color:#c06060">5</div><div class="dr-item-t"><strong style="color:#c06060">El juicio interno</strong>"¿Por qué soy así?", "no tengo remedio", "de nuevo lo mismo". Ese juicio genera vergüenza. Y la vergüenza es el mejor fertilizante que existe para que el AEF crezca con más fuerza.</div></div>
+        <div class="dr-item" style="border-color:#c06060"><div class="dr-item-n" style="color:#c06060">6</div><div class="dr-item-t"><strong style="color:#c06060">Refuerzo del AEF</strong>El ciclo se confirma. El AEF recibe la señal de que tenía razón al activarse. El mundo sigue siendo peligroso. Mejor no moverse. Y así otra vez.</div></div>
+      </div>
+      <div class="dr-quote" style="border-color:#c06060">"Intentar superar al AEF con fuerza de voluntad es como intentar apagar un incendio con un ventilador. No solo no funciona: lo aviva."</div>
+      <div class="dr-ex">
+        <div class="dr-ex-title">✦ Para mapear tu ciclo personal</div>
+        <div class="dr-ex-body">Pensá en la última vez que te bloqueaste en algo importante. Seguí los 6 pasos hacia atrás: ¿cuál fue el juicio? ¿cuál fue el comportamiento? ¿cuál fue la decisión? ¿qué pasó en el cuerpo? ¿cuál fue el disparador? ¿a qué herida del pasado te recuerda todo eso?</div>
+      </div>
+    `
+  },
+  recon: {
+    color:'#5aaa80', label:'Pilar 1 del Método AEF',
+    title:'Reconocimiento — Ver al AEF',
+    tagline:'No podés sanar lo que no podés ver. Y ver ya es mover.',
+    content:`
+      <div class="dr-body">
+        <p>El reconocimiento es el primer paso y la condición de posibilidad de todo lo que viene. No es un momento de epifanía dramática. Es una práctica: aprender a identificar al AEF en tiempo real — en el cuerpo, en los pensamientos, en los comportamientos — antes de que decida por vos.</p>
+        <p>Requiere dos cosas juntas: observación honesta de tus propios patrones, y compasión suficiente para no colapsar bajo el peso de lo que observás. Sin compasión, la observación se convierte en juicio. Y el juicio alimenta al AEF.</p>
+        <p>La pregunta que abre el reconocimiento no es "¿por qué soy así?". Es "¿qué está protegiendo el AEF en este momento?".</p>
+      </div>
+      <div class="dr-quote" style="border-color:#5aaa80">"Cada vez que identificamos al AEF antes de que tome una decisión por nosotros, recuperamos un poco más de agencia sobre nuestra propia vida."</div>
+      <div class="dr-ex">
+        <div class="dr-ex-title">✦ Práctica semanal — Diario de Reconocimiento</div>
+        <div class="dr-ex-body">Al final de cada semana respondé: ¿En qué momentos reconocí al AEF activo? ¿Cuál fue el disparador? ¿Lo vi en tiempo real o solo después? ¿Qué aprendí esta semana sobre mi AEF que no sabía la semana anterior?</div>
+      </div>
+      <div class="dr-next">
+        <div class="dr-next-label">La señal de que está funcionando</div>
+        <div class="dr-next-text">Empezás a identificar al AEF mientras está pasando, no solo en retrospectiva. La autocrítica aparece pero ya no te arrastra. Podés observarla desde cierta distancia.</div>
+      </div>
+    `
+  },
+  dialogo: {
+    color:'#5aaa80', label:'Pilar 2 del Método AEF',
+    title:'Diálogo — Hablarle y Escuchar',
+    tagline:'No un monólogo. Un diálogo real con la parte más antigua de vos.',
+    content:`
+      <div class="dr-body">
+        <p>Una vez que podés ver al AEF, el siguiente paso es hablarle. No para convencerlo, no para controlarlo — para establecer comunicación real con él.</p>
+        <p>El AEF no habla en el lenguaje abstracto de los conceptos. Habla en imágenes, emociones y sensaciones corporales. Cuando preguntás "¿qué estás protegiendo?", la respuesta que llega no siempre es una frase clara. Puede ser una imagen, un color, una sensación de contracción en el pecho, una emoción que sube de repente.</p>
+        <p>Aprender a leer ese lenguaje es aprender el idioma del AEF. Y cuando el AEF siente que su idioma es comprendido — que no necesita gritar a través de comportamientos extremos para hacerse oír — empieza a comunicarse con más sutileza.</p>
+      </div>
+      <div class="dr-quote" style="border-color:#5aaa80">"Gracias por cuidarme. Escucho lo que me decís. Y hoy puedo avanzar de todas formas, porque ya no estamos solos."</div>
+      <div class="dr-ex">
+        <div class="dr-ex-title">✦ El Diálogo Directo</div>
+        <div class="dr-ex-body">Sentate en silencio con tu diario. Cerrá los ojos. Visualizá al AEF frente a vos — como un niño o adolescente. Preguntale: "¿Qué estás protegiendo hoy?" Escuchá sin censurar. Luego: "¿Qué necesitas que yo sepa?" Escribí todo lo que apareció, sin editar.</div>
+      </div>
+    `
+  },
+  sanacion: {
+    color:'#5aaa80', label:'Pilar 3 — La Pantalla de TV',
+    title:'Sanación — Volver para Sanar',
+    tagline:'No para cambiar lo que pasó. Para cambiar cómo lo sentís hoy.',
+    content:`
+      <div class="dr-body">
+        <p>El AEF no se mata, no se suprime, no se convence con argumentos. Se sana. Y la sanación ocurre en el único lugar donde puede ocurrir: en la experiencia del pasado donde el AEF fue formado.</p>
+        <p>Esto es posible gracias a cómo funciona la memoria. Los recuerdos no son fotografías fijas — son construcciones dinámicas que se actualizan cada vez que los evocamos. La neurociencia llama a esto reconsolidación de la memoria. Cuando intervenimos en una escena del pasado con el estado emocional correcto, podemos cambiar cómo el sistema nervioso siente esa experiencia. No borramos lo que ocurrió. Cambiamos la relación que nuestro cuerpo tiene con eso.</p>
+      </div>
+      <div class="dr-items">
+        <div class="dr-item" style="border-color:#5aaa80"><div class="dr-item-n" style="color:#5aaa80">1</div><div class="dr-item-t"><strong style="color:#5aaa80">La pantalla de TV</strong>Visualizás la escena del pasado en una pantalla. Vos estás aquí, seguro, en el presente. La escena está allá. Sos el director.</div></div>
+        <div class="dr-item" style="border-color:#5aaa80"><div class="dr-item-n" style="color:#5aaa80">2</div><div class="dr-item-t"><strong style="color:#5aaa80">El aliado</strong>Preguntate qué necesitaba el niño de esa escena que no tuvo. Dejá que aparezca un aliado — una persona, un animal, una figura, una fuerza. No lo censures. El sistema nervioso sabe lo que necesita.</div></div>
+        <div class="dr-item" style="border-color:#5aaa80"><div class="dr-item-n" style="color:#5aaa80">3</div><div class="dr-item-t"><strong style="color:#5aaa80">La intervención</strong>El aliado entra en la escena. La escena se desarrolla hasta un punto de resolución. El niño recibe lo que faltó.</div></div>
+        <div class="dr-item" style="border-color:#5aaa80"><div class="dr-item-n" style="color:#5aaa80">4</div><div class="dr-item-t"><strong style="color:#5aaa80">La transferencia</strong>Llevás esa emoción sanada al presente. La sentís en el cuerpo ahora. El movimiento ancla la experiencia.</div></div>
+      </div>
+      <div class="dr-quote" style="border-color:#5aaa80">"Cambiar el pasado no es posible. Cambiar cómo el presente siente el pasado es no solo posible, sino el mecanismo central de toda transformación duradera."</div>
+    `
+  },
+  integracion: {
+    color:'#7acc98', label:'Pilar 4 del Método AEF',
+    title:'Integración — Volver al Camino y Sostenerlo',
+    tagline:'El insight sin práctica no cambia nada. La transformación vive en lo cotidiano.',
+    content:`
+      <div class="dr-body">
+        <p>La integración es el pilar más subestimado. Muchas personas hacen el trabajo de reconocimiento, diálogo y sanación, pero no crean puentes con su vida cotidiana. El trabajo queda aislado en momentos especiales y no permea los días.</p>
+        <p>La integración ocurre a través de microacciones: pequeñas cosas concretas que el Yo Futuro haría y que el yo presente elige hacer hoy, a pesar del AEF. Cada microacción es evidencia para el sistema nervioso de que el mundo puede vivirse diferente. Y esa evidencia acumulada es la que realmente cambia al AEF.</p>
+        <p>El criterio es simple: ¿qué haría el Yo Futuro en esta situación? Tomá el 10% de eso. Si el Yo Futuro daría una charla, vos hoy compartís una opinión en una conversación pequeña. Así se construye.</p>
+      </div>
+      <div class="dr-cols">
+        <div class="dr-col" style="border-color:#7acc98">
+          <div class="dr-col-title" style="color:#7acc98">Todos los días</div>
+          <div class="dr-col-body">Ritual matutino de 15 minutos + registro corporal + una microacción del Yo Futuro.</div>
+        </div>
+        <div class="dr-col" style="border-color:#7acc98">
+          <div class="dr-col-title" style="color:#7acc98">Cada semana</div>
+          <div class="dr-col-body">Diálogo con el AEF (20-30 min) + revisión del diario de reconocimiento.</div>
+        </div>
+        <div class="dr-col" style="border-color:#7acc98">
+          <div class="dr-col-title" style="color:#7acc98">Cada mes</div>
+          <div class="dr-col-body">Pantalla de TV con una escena nueva o más profunda (40-60 min).</div>
+        </div>
+        <div class="dr-col" style="border-color:#7acc98">
+          <div class="dr-col-title" style="color:#7acc98">Cada tres meses</div>
+          <div class="dr-col-body">Revisión del Yo Futuro: actualizar la visualización y las 5 dimensiones.</div>
+        </div>
+      </div>
+      <div class="dr-quote" style="border-color:#7acc98">"No es lo que hacés una vez lo que determina quién sos. Es lo que hacés todos los días."</div>
+    `
+  },
+  futuro: {
+    color:'#b89552', label:'Cap. 4 — El Futuro Logrado',
+    title:'El Yo Futuro',
+    tagline:'No una versión perfecta. Una versión integrada — que ya podés empezar a ser.',
+    content:`
+      <div class="dr-body">
+        <p>El Yo Futuro no es una fantasía. No es una versión perfecta de vos que ya tiene todo resuelto, que nunca duda y que vive en estado permanente de iluminación. Esa versión no existe.</p>
+        <p>El Yo Futuro es algo mucho más accesible y mucho más poderoso: la versión de vos que integró las lecciones del pasado, que actúa desde la confianza en lugar del miedo, que puede sostener el error sin derrumbarse, y que siente alegría genuina — no euforia performativa — en el proceso de construir su vida.</p>
+        <p>La diferencia entre el Yo actual bloqueado por el AEF y el Yo Futuro no es de información ni de recursos. Es de estado interno. Y ese estado se aprende, se practica y se construye, una microacción a la vez.</p>
+      </div>
+      <div class="dr-items">
+        <div class="dr-item" style="border-color:#b89552"><div class="dr-item-n" style="color:#b89552">1</div><div class="dr-item-t"><strong style="color:#b89552">Acción confiada</strong>Toma decisiones desde lo que desea, no desde lo que quiere evitar. Actúa a pesar de la incertidumbre — no solo cuando la incertidumbre desaparece.</div></div>
+        <div class="dr-item" style="border-color:#b89552"><div class="dr-item-n" style="color:#b89552">2</div><div class="dr-item-t"><strong style="color:#b89552">Tolerancia a la incertidumbre</strong>No necesita controlar todo para sentirse seguro. Puede habitar el "no sé" sin que eso lo paralice.</div></div>
+        <div class="dr-item" style="border-color:#b89552"><div class="dr-item-n" style="color:#b89552">3</div><div class="dr-item-t"><strong style="color:#b89552">Alegría integrada</strong>Experimenta disfrute genuino en el proceso, no solo en la llegada. El camino tiene valor en sí mismo.</div></div>
+        <div class="dr-item" style="border-color:#b89552"><div class="dr-item-n" style="color:#b89552">4</div><div class="dr-item-t"><strong style="color:#b89552">Coherencia profunda</strong>Lo que piensa, dice y hace se alinean con sus valores reales. No actúa para complacer ni para evitar juicio.</div></div>
+        <div class="dr-item" style="border-color:#b89552"><div class="dr-item-n" style="color:#b89552">5</div><div class="dr-item-t"><strong style="color:#b89552">AEF aliado</strong>Reconoce al AEF y sabe responderle con compasión y firmeza. Lo escucha sin obedecerle automáticamente. El guardián se vuelve compañero.</div></div>
+      </div>
+      <div class="dr-quote" style="border-color:#b89552">"El Yo Futuro no espera en algún horizonte lejano. Existe ahora como potencial, y cada vez que lo visualizás con precisión emocional, lo traés un poco más cerca."</div>
+      <div class="dr-ex">
+        <div class="dr-ex-title">✦ Visualización — Encontrarte con el Yo Futuro</div>
+        <div class="dr-ex-body">Cerrá los ojos. Imaginá que viajás tres años al futuro. ¿Dónde estás? ¿Cuál es tu postura? ¿Cómo está el pecho? Observá al Yo Futuro en acción: ¿cómo responde cuando algo sale mal? ¿Cómo habla? ¿Qué emoción predomina? Dejá que te diga algo. Escribilo todo. Luego: ¿qué microacción podés tomar hoy que refleje a esa versión?</div>
+      </div>
+    `
+  }
+};
+
+// ── TOOLTIP LOGIC ──
+const tooltip = document.getElementById('tooltip');
+let tipVisible = false;
+
+function showTip(e, id) {
+  const t = tips[id];
+  if (!t) return;
+  document.getElementById('tt-label').textContent = t.label;
+  document.getElementById('tt-title').textContent = t.title;
+  document.getElementById('tt-body').innerHTML = t.body;
+  document.getElementById('tt-question').textContent = t.q;
+  tooltip.style.color = '#d4cfc5';
+  positionTip(e);
+  tooltip.classList.add('visible');
+  tipVisible = true;
+}
+
+function hideTip() {
+  tooltip.classList.remove('visible');
+  tipVisible = false;
+}
+
+function positionTip(e) {
+  const margin = 16;
+  const tw = 320, th = 220;
+  let x = e.clientX + margin;
+  let y = e.clientY + margin;
+  if (x + tw > window.innerWidth - 10) x = e.clientX - tw - margin;
+  if (y + th > window.innerHeight - 10) y = e.clientY - th - margin;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+document.addEventListener('mousemove', e => {
+  if (tipVisible) positionTip(e);
+});
+
+// ── DRAWER LOGIC ──
+function openDrawer(id) {
+  const d = drawers[id];
+  if (!d) return;
+  hideTip();
+  const content = document.getElementById('drawer-content');
+  content.innerHTML = `
+    <div class="dr-label">${d.label}</div>
+    <div class="dr-title" style="color:${d.color}">${d.title}</div>
+    <div class="dr-tagline">${d.tagline}</div>
+    <div class="dr-divider"></div>
+    ${d.content}
+  `;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDrawer();
+});
+</script>
+</body>
+</html>
