@@ -2088,6 +2088,15 @@ window.addEventListener('message',function(ev){
 window.addEventListener('message',function(ev){
   if(ev.data==='closeMap') closeMapaFullscreen();
 });
+
+// ── MAP IFRAME CLOSE LISTENER ─────────────────────────────
+window.addEventListener('message', function(ev) {
+  if (ev.data === 'closeMap') {
+    var mf = document.getElementById('mapaFullscreen');
+    if (mf) mf.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+});
 </script>
 </body>
 </html>
