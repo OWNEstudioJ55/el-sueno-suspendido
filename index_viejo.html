@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Sueño Suspendido — Sebastián Borja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --negro:#050505;
+  --negro2:#0a0a0a;
+  --negro3:#111;
+  --oro:#C9A84C;
+  --oro2:#D4AF5A;
+  --oro3:rgba(201,168,76,0.12);
+  --oro4:rgba(201,168,76,0.04);
+  --blanco:#F4EFE6;
+  --gris:#7A7060;
+  --gris2:#4a4640;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--negro);color:var(--blanco);font-family:'Lato',sans-serif;font-weight:300;overflow-x:hidden}
+
+/* ── HERO ─────────────────────────────────────────── */
+.hero{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 70% 50%, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+.hero-left{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:80px 60px 80px 80px;
+  position:relative;
+  z-index:2;
+}
+
+.hero-eyebrow{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:6px;
+  color:var(--oro);
+  text-transform:uppercase;
+  margin-bottom:32px;
+  opacity:0;
+  animation:fadeUp 0.8s ease 0.2s forwards;
+}
+
+.hero-titulo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(42px,5vw,72px);
+  font-weight:300;
+  line-height:1.05;
+  letter-spacing:-0.5px;
+  color:var(--blanco);
+  margin-bottom:24px;
+  opacity:0;
+  animation:fadeUp 0.8s ease 0.4s forwards;
+}
+
+.hero-titulo em{
+  font-style:italic;
+  color:var(--oro2);
+}
+
+.hero-linea{
+  width:48px;
+  height:1px;
+  background:var(--oro);
+  margin-bottom:28px;
+  opacity:0;
+  animation:fadeUp 0.8s ease 0.6s forwards;
+}
+
+.hero-subtitulo{
+  font-size:16px;
+  line-height:1.75;
+  color:var(--gris);
+  max-width:420px;
+  margin-bottom:48px;
+  opacity:0;
+  animation:fadeUp 0.8s ease 0.7s forwards;
+}
+
+.hero-subtitulo strong{
+  color:var(--blanco);
+  font-weight:400;
+}
+
+.hero-cta-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  opacity:0;
+  animation:fadeUp 0.8s ease 0.9s forwards;
+}
+
+.btn-primario{
+  display:inline-flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 28px;
+  background:transparent;
+  border:1px solid var(--oro);
+  color:var(--oro);
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  text-decoration:none;
+  cursor:pointer;
+  transition:all 0.25s ease;
+  max-width:340px;
+}
+.btn-primario:hover{background:var(--oro3);}
+.btn-primario span{font-size:16px;margin-left:12px;}
+
+.btn-secundario{
+  font-size:12px;
+  color:var(--gris);
+  text-decoration:none;
+  letter-spacing:2px;
+  transition:color 0.2s;
+  padding-left:2px;
+}
+.btn-secundario:hover{color:var(--blanco);}
+
+.hero-right{
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.hero-right::before{
+  content:'';
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:120px;
+  background:linear-gradient(to right, var(--negro), transparent);
+  z-index:2;
+}
+
+.hero-img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:top center;
+  opacity:0;
+  animation:fadeIn 1.2s ease 0.5s forwards;
+  filter:grayscale(15%);
+}
+
+.hero-nombre{
+  position:absolute;
+  bottom:40px;
+  right:40px;
+  text-align:right;
+  z-index:3;
+  opacity:0;
+  animation:fadeUp 0.8s ease 1s forwards;
+}
+.hero-nombre-titulo{
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  letter-spacing:4px;
+  color:var(--oro);
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.hero-nombre-sub{
+  font-size:11px;
+  color:var(--gris);
+  letter-spacing:2px;
+}
+
+/* ── INTERRUPCIÓN ─────────────────────────────────── */
+.interrupcion{
+  padding:100px 80px;
+  max-width:800px;
+  margin:0 auto;
+  text-align:center;
+}
+
+.interrupcion-pre{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:6px;
+  color:var(--gris2);
+  text-transform:uppercase;
+  margin-bottom:40px;
+}
+
+.interrupcion-frase{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(28px,4vw,48px);
+  font-weight:300;
+  line-height:1.3;
+  color:var(--blanco);
+  margin-bottom:24px;
+}
+
+.interrupcion-frase em{
+  font-style:italic;
+  color:var(--oro2);
+}
+
+.interrupcion-p{
+  font-size:15px;
+  line-height:1.85;
+  color:var(--gris);
+  max-width:560px;
+  margin:0 auto;
+}
+
+/* ── ESPEJO ───────────────────────────────────────── */
+.espejo{
+  border-top:1px solid rgba(201,168,76,0.08);
+  border-bottom:1px solid rgba(201,168,76,0.08);
+  background:var(--negro2);
+  padding:80px;
+}
+
+.espejo-grid{
+  max-width:1000px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1px;
+  background:rgba(201,168,76,0.08);
+}
+
+.espejo-item{
+  background:var(--negro2);
+  padding:40px 36px;
+  cursor:default;
+  transition:background 0.2s;
+}
+.espejo-item:hover{background:var(--oro4);}
+
+.espejo-num{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:4px;
+  color:var(--gris2);
+  margin-bottom:20px;
+}
+
+.espejo-texto{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;
+  font-weight:300;
+  line-height:1.5;
+  color:var(--blanco);
+  font-style:italic;
+}
+
+/* ── EL LIBRO ─────────────────────────────────────── */
+.libro-section{
+  padding:100px 80px;
+  max-width:1100px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:center;
+}
+
+.libro-label{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:6px;
+  color:var(--oro);
+  text-transform:uppercase;
+  margin-bottom:24px;
+}
+
+.libro-titulo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(28px,3vw,42px);
+  font-weight:300;
+  line-height:1.2;
+  color:var(--blanco);
+  margin-bottom:24px;
+}
+
+.libro-titulo em{font-style:italic;color:var(--oro2);}
+
+.libro-p{
+  font-size:15px;
+  line-height:1.85;
+  color:var(--gris);
+  margin-bottom:16px;
+}
+
+.libro-p strong{color:var(--blanco);font-weight:400;}
+
+.libro-derecha{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  background:rgba(201,168,76,0.08);
+}
+
+.libro-cap{
+  background:var(--negro);
+  padding:20px 24px;
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  transition:background 0.2s;
+  cursor:default;
+}
+.libro-cap:hover{background:var(--negro2);}
+
+.libro-cap-num{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:3px;
+  color:var(--gris2);
+  min-width:28px;
+  padding-top:2px;
+}
+
+.libro-cap-texto{
+  font-size:13px;
+  color:var(--gris);
+  line-height:1.5;
+}
+
+.libro-cap-texto strong{
+  display:block;
+  color:var(--blanco);
+  font-weight:400;
+  margin-bottom:2px;
+  font-size:13px;
+}
+
+/* ── PLANES ───────────────────────────────────────── */
+.planes-section{
+  background:var(--negro2);
+  border-top:1px solid rgba(201,168,76,0.08);
+  padding:100px 80px;
+}
+
+.planes-header{
+  text-align:center;
+  max-width:600px;
+  margin:0 auto 64px;
+}
+
+.planes-label{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:6px;
+  color:var(--oro);
+  text-transform:uppercase;
+  margin-bottom:20px;
+}
+
+.planes-titulo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(28px,3vw,42px);
+  font-weight:300;
+  color:var(--blanco);
+  line-height:1.2;
+}
+
+.planes-titulo em{font-style:italic;color:var(--oro2);}
+
+.planes-grid{
+  max-width:900px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1px;
+  background:rgba(201,168,76,0.08);
+}
+
+.plan{
+  background:var(--negro2);
+  padding:40px 32px;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  transition:background 0.2s;
+}
+
+.plan:hover{background:var(--negro3);}
+
+.plan.destacado{
+  background:var(--negro3);
+}
+
+.plan-badge{
+  position:absolute;
+  top:-1px;left:50%;
+  transform:translateX(-50%);
+  background:var(--oro);
+  color:var(--negro);
+  font-family:'Cinzel',serif;
+  font-size:8px;
+  letter-spacing:3px;
+  padding:5px 14px;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.plan-nombre{
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  letter-spacing:4px;
+  color:var(--oro);
+  text-transform:uppercase;
+  margin-bottom:20px;
+}
+
+.plan-precio{
+  font-family:'Cormorant Garamond',serif;
+  font-size:42px;
+  font-weight:300;
+  color:var(--blanco);
+  line-height:1;
+  margin-bottom:4px;
+}
+
+.plan-precio span{font-size:16px;vertical-align:super;}
+
+.plan-desc{
+  font-size:12px;
+  color:var(--gris);
+  margin-bottom:32px;
+  letter-spacing:1px;
+}
+
+.plan-items{
+  list-style:none;
+  margin-bottom:40px;
+  flex:1;
+}
+
+.plan-items li{
+  font-size:13px;
+  color:var(--gris);
+  padding:8px 0;
+  border-bottom:1px solid rgba(201,168,76,0.06);
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  line-height:1.5;
+}
+
+.plan-items li::before{
+  content:'—';
+  color:var(--gris2);
+  flex-shrink:0;
+  font-size:10px;
+  padding-top:2px;
+}
+
+.btn-plan{
+  display:block;
+  text-align:center;
+  padding:16px;
+  border:1px solid rgba(201,168,76,0.3);
+  color:var(--oro);
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  text-decoration:none;
+  transition:all 0.25s;
+}
+
+.btn-plan:hover{
+  background:var(--oro3);
+  border-color:var(--oro);
+}
+
+.plan.destacado .btn-plan{
+  background:var(--oro);
+  color:var(--negro);
+  border-color:var(--oro);
+}
+
+.plan.destacado .btn-plan:hover{
+  background:var(--oro2);
+}
+
+/* ── SEBASTIAN ────────────────────────────────────── */
+.sebastian-section{
+  padding:100px 80px;
+  max-width:1100px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 2fr;
+  gap:80px;
+  align-items:center;
+}
+
+.sebastian-img-wrap{
+  position:relative;
+}
+
+.sebastian-img-wrap::after{
+  content:'';
+  position:absolute;
+  inset:-12px;
+  border:1px solid rgba(201,168,76,0.15);
+  pointer-events:none;
+}
+
+.sebastian-img{
+  width:100%;
+  display:block;
+  filter:grayscale(20%);
+}
+
+.sebastian-label{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:6px;
+  color:var(--oro);
+  text-transform:uppercase;
+  margin-bottom:24px;
+}
+
+.sebastian-nombre{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(28px,3vw,42px);
+  font-weight:300;
+  color:var(--blanco);
+  line-height:1.2;
+  margin-bottom:24px;
+}
+
+.sebastian-nombre em{font-style:italic;color:var(--oro2);}
+
+.sebastian-p{
+  font-size:15px;
+  line-height:1.85;
+  color:var(--gris);
+  margin-bottom:16px;
+}
+
+.sebastian-p strong{color:var(--blanco);font-weight:400;}
+
+.sebastian-frase{
+  margin-top:32px;
+  padding:24px 28px;
+  border-left:1px solid var(--oro);
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;
+  font-style:italic;
+  font-weight:300;
+  color:var(--blanco);
+  line-height:1.5;
+}
+
+/* ── CIERRE ───────────────────────────────────────── */
+.cierre{
+  background:var(--negro2);
+  border-top:1px solid rgba(201,168,76,0.08);
+  padding:120px 80px;
+  text-align:center;
+}
+
+.cierre-titulo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,4vw,56px);
+  font-weight:300;
+  color:var(--blanco);
+  line-height:1.2;
+  max-width:700px;
+  margin:0 auto 16px;
+}
+
+.cierre-titulo em{font-style:italic;color:var(--oro2);}
+
+.cierre-sub{
+  font-size:14px;
+  color:var(--gris);
+  letter-spacing:2px;
+  margin-bottom:48px;
+}
+
+.cierre-btns{
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* ── FOOTER ───────────────────────────────────────── */
+footer{
+  padding:40px 80px;
+  border-top:1px solid rgba(201,168,76,0.06);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.footer-logo{
+  font-family:'Cinzel',serif;
+  font-size:10px;
+  letter-spacing:4px;
+  color:var(--gris2);
+  text-transform:uppercase;
+}
+
+.footer-copy{
+  font-size:11px;
+  color:var(--gris2);
+  letter-spacing:1px;
+}
+
+/* ── ANIMACIONES ──────────────────────────────────── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible{
+  opacity:1;
+  transform:none;
+}
+
+/* ── MOBILE ───────────────────────────────────────── */
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto;}
+  .hero-left{padding:60px 28px 40px;}
+  .hero-right{height:60vw;max-height:380px;}
+  .hero-nombre{bottom:20px;right:20px;}
+  .interrupcion{padding:60px 28px;}
+  .espejo{padding:60px 28px;}
+  .espejo-grid{grid-template-columns:1fr;}
+  .libro-section{grid-template-columns:1fr;padding:60px 28px;gap:40px;}
+  .planes-section{padding:60px 28px;}
+  .planes-grid{grid-template-columns:1fr;}
+  .sebastian-section{grid-template-columns:1fr;padding:60px 28px;gap:40px;}
+  .cierre{padding:80px 28px;}
+  .cierre-btns{flex-direction:column;align-items:center;}
+  .btn-primario{max-width:100%;}
+  footer{padding:28px;flex-direction:column;gap:12px;text-align:center;}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+  .hero-eyebrow,.hero-titulo,.hero-linea,.hero-subtitulo,.hero-cta-wrap,.hero-img,.hero-nombre{opacity:1!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Sebastián Borja</div>
+    <h1 class="hero-titulo">El Sueño<br><em>Suspendido</em></h1>
+    <div class="hero-linea"></div>
+    <p class="hero-subtitulo">
+      Hay algo dentro tuyo que lleva años<br>
+      <strong>impidiendo que tu sueño se haga real.</strong><br>
+      No es falta de esfuerzo. No es falta de talento.<br>
+      Es algo mucho más antiguo.
+    </p>
+    <div class="hero-cta-wrap">
+      <a href="#planes" class="btn-primario">
+        Quiero saber qué es <span>→</span>
+      </a>
+      <a href="#libro" class="btn-secundario">Ver de qué trata el libro</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="sebastianborja.png" alt="Sebastián Borja" class="hero-img">
+    <div class="hero-nombre">
+      <div class="hero-nombre-titulo">Sebastián Borja</div>
+      <div class="hero-nombre-sub">Autor · Facilitador</div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERRUPCIÓN -->
+<section class="interrupcion reveal">
+  <div class="interrupcion-pre">Lo que nadie te dijo</div>
+  <h2 class="interrupcion-frase">
+    No fallaste porque sos incapaz.<br>
+    Fallaste porque <em>alguien más</em><br>tomó la decisión por vos.
+  </h2>
+  <p class="interrupcion-p">
+    Hay una versión de vos que se formó en los momentos más difíciles de tu vida. Aprendió a protegerte. Y lleva años haciéndolo — aunque ya no lo necesites. Ese es el Alter Ego Fracasado. Y mientras no lo veas, sigue eligiendo por vos.
+  </p>
+</section>
+
+<!-- ESPEJO -->
+<section class="espejo">
+  <div class="espejo-grid">
+    <div class="espejo-item reveal">
+      <div class="espejo-num">01</div>
+      <div class="espejo-texto">"Llegué hasta aquí y algo me frenó. Siempre pasa lo mismo."</div>
+    </div>
+    <div class="espejo-item reveal">
+      <div class="espejo-num">02</div>
+      <div class="espejo-texto">"Sé lo que tengo que hacer. Pero no lo hago. No entiendo por qué."</div>
+    </div>
+    <div class="espejo-item reveal">
+      <div class="espejo-num">03</div>
+      <div class="espejo-texto">"Logré muchas cosas. Pero mi sueño real todavía está esperando."</div>
+    </div>
+  </div>
+</section>
+
+<!-- EL LIBRO -->
+<section class="libro-section" id="libro">
+  <div class="libro-izquierda reveal">
+    <div class="libro-label">El libro</div>
+    <h2 class="libro-titulo">Un mapa para ver<br><em>lo que no podías ver</em></h2>
+    <p class="libro-p">
+      El Sueño Suspendido no es un libro de autoayuda. No tiene listas de hábitos ni técnicas de productividad. Es un proceso de reconocimiento profundo.
+    </p>
+    <p class="libro-p">
+      <strong>Te muestra quién tomó el control de tu vida en los momentos en que más dolía.</strong> Y te da las herramientas para que esa voz deje de decidir por vos.
+    </p>
+    <p class="libro-p">
+      Sebastián Borja construyó este sistema después de años acompañando personas que sabían exactamente lo que querían — y no podían avanzar.
+    </p>
+  </div>
+  <div class="libro-derecha reveal">
+    <div class="libro-cap">
+      <div class="libro-cap-num">I</div>
+      <div class="libro-cap-texto"><strong>El castillo y el guardián</strong>Por qué una parte de vos no quiere que salgas</div>
+    </div>
+    <div class="libro-cap">
+      <div class="libro-cap-num">II</div>
+      <div class="libro-cap-texto"><strong>El origen del AEF</strong>Cuándo y cómo se formó la voz que te frena</div>
+    </div>
+    <div class="libro-cap">
+      <div class="libro-cap-num">III</div>
+      <div class="libro-cap-texto"><strong>El ciclo que no termina</strong>Por qué alcanzás cosas pero no cruzás al otro lado</div>
+    </div>
+    <div class="libro-cap">
+      <div class="libro-cap-num">IV</div>
+      <div class="libro-cap-texto"><strong>Reconocimiento</strong>Ver al AEF sin juzgarlo ni destruirlo</div>
+    </div>
+    <div class="libro-cap">
+      <div class="libro-cap-num">V</div>
+      <div class="libro-cap-texto"><strong>El diálogo</strong>Hablarle a la parte que cuida para que suelte el control</div>
+    </div>
+    <div class="libro-cap">
+      <div class="libro-cap-num">VI</div>
+      <div class="libro-cap-texto"><strong>La decisión</strong>No es porque podés. Es porque decidís.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANES -->
+<section class="planes-section" id="planes">
+  <div class="planes-header reveal">
+    <div class="planes-label">Acceso al libro</div>
+    <h2 class="planes-titulo">Elegí cómo<br><em>querés entrar</em></h2>
+  </div>
+  <div class="planes-grid">
+
+    <div class="plan reveal">
+      <div class="plan-nombre">Esencial</div>
+      <div class="plan-precio"><span>USD </span>17</div>
+      <div class="plan-desc">Acceso completo al libro digital</div>
+      <ul class="plan-items">
+        <li>El Sueño Suspendido en PDF</li>
+        <li>Metodología AEF completa</li>
+        <li>Mapa interactivo del AEF</li>
+      </ul>
+      <a href="https://pay.hotmart.com/X105262338E?off=van91dx4&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
+    </div>
+
+    <div class="plan destacado reveal">
+      <div class="plan-badge">Más elegido</div>
+      <div class="plan-nombre">Profundo</div>
+      <div class="plan-precio"><span>USD </span>27</div>
+      <div class="plan-desc">Libro + app interactiva</div>
+      <ul class="plan-items">
+        <li>Todo lo del plan Esencial</li>
+        <li>App del libro con 15 capítulos</li>
+        <li>Rueda de diagnóstico</li>
+        <li>Plan de 90 días guiado</li>
+      </ul>
+      <a href="https://pay.hotmart.com/X105262051P?off=qolhri8f&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
+    </div>
+
+    <div class="plan reveal">
+      <div class="plan-nombre">Revelador</div>
+      <div class="plan-precio"><span>USD </span>47</div>
+      <div class="plan-desc">Experiencia completa</div>
+      <ul class="plan-items">
+        <li>Todo lo del plan Profundo</li>
+        <li>Guías de audio inmersivas</li>
+        <li>Acceso a futuras actualizaciones</li>
+        <li>Prioridad en próximas charlas</li>
+      </ul>
+      <a href="https://pay.hotmart.com/U105301226T?off=o6eb0ag6&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- SEBASTIÁN -->
+<section class="sebastian-section">
+  <div class="sebastian-img-wrap reveal">
+    <img src="sebastianborja.png" alt="Sebastián Borja" class="sebastian-img">
+  </div>
+  <div class="reveal">
+    <div class="sebastian-label">Sebastián Borja</div>
+    <h2 class="sebastian-nombre">No soy el ejemplo.<br><em>Soy la posibilidad.</em></h2>
+    <p class="sebastian-p">
+      Pasé años acompañando personas que lo tenían todo para avanzar y no podían. Personas que alcanzaban, construían, lograban — y seguían sintiéndose del otro lado de su sueño real.
+    </p>
+    <p class="sebastian-p">
+      <strong>Construí este sistema porque lo viví.</strong> Porque conozco esa voz que cuida y paraliza al mismo tiempo. Y porque sé que el momento en que la ves, algo cambia para siempre.
+    </p>
+    <p class="sebastian-p">
+      No te muestro esto para que me imites. Te lo muestro para que te veas a vos mismo en ello. Para que compruebes que los sueños se alcanzan con una sola decisión.
+    </p>
+    <div class="sebastian-frase">
+      "No es porque puedo.<br>Es porque decido."
+    </div>
+  </div>
+</section>
+
+<!-- CIERRE -->
+<section class="cierre reveal">
+  <h2 class="cierre-titulo">
+    Tu sueño no está perdido.<br>
+    Está <em>suspendido.</em>
+  </h2>
+  <p class="cierre-sub">La diferencia entre los dos es una decisión.</p>
+  <div class="cierre-btns">
+    <a href="#planes" class="btn-primario">Quiero tomar esa decisión <span>→</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">El Sueño Suspendido</div>
+  <div class="footer-copy">© 2026 Sebastián Borja. Todos los derechos reservados.</div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+    }
+  });
+}, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
