@@ -438,11 +438,11 @@ function sDraw(){
     g.strokeStyle='rgba(201,168,76,'+(0.02/h)+')';g.lineWidth=0.3;g.stroke();
   }
   if(snumA>0){
-    g.save();g.font='100 36px Georgia';
-    g.fillStyle='rgba(201,168,76,'+snumA*0.09+')';
+    g.save();g.font='100 22px Georgia';
+    g.fillStyle='rgba(201,168,76,'+snumA*0.018+')';
     g.textAlign='center';g.textBaseline='middle';
     g.fillText(snumTxt,MX,MY);g.restore();
-    snumA=Math.max(0,snumA-0.002);
+    snumA=Math.max(0,snumA-0.004);
   }
   scx+=(sdx-scx)*0.008;scy+=(sdy-scy)*0.008;
   szoom*=(1+SVVEL);
