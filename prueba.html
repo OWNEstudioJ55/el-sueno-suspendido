@@ -130,6 +130,15 @@ html,body{height:100%;background:#050505;color:#F4EFE6;font-family:'Lato',sans-s
 <div id="progreso-wrap"><div id="progreso-barra"></div></div>
 <div id="paso-actual"></div>
 
+<!-- ENTRADA — desbloquea audio -->
+<div id="entrada" style="position:fixed;inset:0;z-index:999;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;" onclick="desbloquear()">
+  <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:8px;color:rgba(201,168,76,0.4);text-transform:uppercase;margin-bottom:32px">Sebastián Borja</div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(32px,6vw,64px);font-weight:300;color:#F4EFE6;text-align:center;line-height:1.1">El Sueño<br><em style="color:#C9A84C">Suspendido</em></div>
+  <div style="width:1px;height:40px;background:linear-gradient(to bottom,transparent,rgba(201,168,76,0.4),transparent);margin:32px auto"></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(201,168,76,0.5);letter-spacing:2px;animation:pulseIn 2s ease infinite">tocá para comenzar</div>
+</div>
+<style>@keyframes pulseIn{0%,100%{opacity:0.4;}50%{opacity:1;}}</style>
+
 <div id="experiencia">
 
 <!-- P0 -->
@@ -499,6 +508,18 @@ function playAudio(pantalla){
     // autoplay bloqueado — silencioso
     ind.classList.remove('visible');
   });
+}
+
+
+function desbloquear(){
+  var el=document.getElementById('entrada');
+  el.style.transition='opacity 0.8s ease';
+  el.style.opacity='0';
+  setTimeout(function(){el.style.display='none';},800);
+  // desbloquear audio tocando uno silencioso
+  var a=new Audio();
+  a.play().catch(function(){});
+  setTimeout(function(){playAudio('p0');},900);
 }
 
 // ── ESTADO ───────────────────────────────────────────
