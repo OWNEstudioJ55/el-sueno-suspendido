@@ -4,755 +4,697 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>El Sueño Suspendido — Sebastián Borja</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:#050505;color:#F4EFE6;font-family:'Lato',sans-serif;font-weight:300;overflow:hidden}
+:root{--oro:#C9A84C;--oro2:rgba(201,168,76,0.12);--blanco:#F4EFE6;--gris:#7A7060;--gris2:#3a3830;}
 
-:root{
-  --negro:#050505;
-  --oro:#C9A84C;
-  --oro2:rgba(201,168,76,0.15);
-  --oro3:rgba(201,168,76,0.06);
-  --blanco:#F4EFE6;
-  --gris:#7A7060;
-  --gris2:#3a3830;
-}
+/* FONDO ESPIRAL */
+#spiral-bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
 
-/* ── CONTENEDOR PRINCIPAL ── */
-#experiencia{
-  width:100%;height:100%;
-  overflow:hidden;
-  position:relative;
-}
+/* CONTENEDOR */
+#experiencia{position:relative;z-index:1;width:100%;height:100%;overflow:hidden;}
 
-/* ── PANTALLAS ── */
+/* PANTALLAS */
 .pantalla{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:40px 28px;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 0.6s ease;
-  overflow-y:auto;
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:40px 28px;
+  opacity:0;pointer-events:none;transition:opacity 0.8s ease;overflow-y:auto;
 }
+.pantalla.activa{opacity:1;pointer-events:all;}
 
-.pantalla.activa{
-  opacity:1;
-  pointer-events:all;
-}
-
-/* ── TIPOGRAFÍA BASE ── */
-.titulo{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(28px,5vw,52px);
-  font-weight:300;
-  line-height:1.15;
-  text-align:center;
-  color:var(--blanco);
-  max-width:700px;
-}
-
-.titulo em{
-  font-style:italic;
-  color:var(--oro);
-}
-
-.subtitulo{
-  font-size:clamp(14px,2vw,17px);
-  line-height:1.85;
-  color:var(--gris);
-  text-align:center;
-  max-width:560px;
-  margin-top:24px;
-}
-
+/* TIPOGRAFÍA */
+.titulo{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,5vw,50px);font-weight:300;line-height:1.15;text-align:center;color:var(--blanco);max-width:680px;}
+.titulo em{font-style:italic;color:var(--oro);}
+.subtitulo{font-size:clamp(13px,2vw,16px);line-height:1.9;color:var(--gris);text-align:center;max-width:520px;margin-top:20px;}
 .subtitulo strong{color:var(--blanco);font-weight:400;}
+.eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:6px;color:var(--gris2);text-transform:uppercase;text-align:center;margin-bottom:24px;}
+.linea{width:1px;height:32px;background:linear-gradient(to bottom,transparent,var(--oro),transparent);margin:24px auto;}
 
-.eyebrow{
-  font-family:'Cinzel',serif;
-  font-size:9px;
-  letter-spacing:6px;
-  color:var(--gris);
-  text-transform:uppercase;
-  text-align:center;
-  margin-bottom:32px;
-}
-
-/* ── LÍNEA DECORATIVA ── */
-.linea{
-  width:1px;
-  height:40px;
-  background:linear-gradient(to bottom,transparent,var(--oro),transparent);
-  margin:32px auto;
-}
-
-/* ── NÚMERO GRANDE ── */
-.numero-grande{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(80px,18vw,180px);
-  font-weight:300;
-  color:var(--blanco);
-  line-height:1;
-  text-align:center;
-  opacity:0;
-  transform:scale(0.9);
-  transition:all 0.8s ease;
-}
+/* NÚMEROS */
+.numero-grande{font-family:'Cormorant Garamond',serif;font-size:clamp(80px,18vw,160px);font-weight:300;color:var(--blanco);line-height:1;text-align:center;opacity:0;transform:scale(0.92);transition:all 1s ease;}
 .numero-grande.visible{opacity:1;transform:scale(1);}
+.numero-tachado{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,5vw,48px);font-weight:300;color:var(--gris2);text-decoration:line-through;text-decoration-color:rgba(201,168,76,0.3);}
 
-.numero-tachado{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(40px,8vw,80px);
-  font-weight:300;
-  color:var(--gris2);
-  line-height:1;
-  text-align:center;
-  text-decoration:line-through;
-  text-decoration-color:rgba(201,168,76,0.4);
-  transition:all 0.5s ease;
-}
-
-/* ── TYPEWRITER ── */
-.typewriter{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(18px,3vw,28px);
-  font-weight:300;
-  font-style:italic;
-  color:var(--blanco);
-  text-align:center;
-  max-width:600px;
-  min-height:40px;
-  line-height:1.5;
-}
-
-/* ── PREGUNTAS ── */
-.pregunta-wrap{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  max-width:520px;
-  width:100%;
-}
-
-.pregunta{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(18px,2.5vw,26px);
-  font-style:italic;
-  font-weight:300;
-  color:var(--gris);
-  text-align:center;
-  opacity:0;
-  transform:translateY(12px);
-  transition:opacity 0.6s ease, transform 0.6s ease, color 0.3s;
-}
+/* PREGUNTAS */
+.pregunta-wrap{display:flex;flex-direction:column;gap:16px;max-width:480px;width:100%;}
+.pregunta{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,23px);font-style:italic;font-weight:300;color:var(--gris);text-align:center;opacity:0;transform:translateY(10px);transition:opacity 0.7s ease,transform 0.7s ease,color 0.4s;}
 .pregunta.visible{opacity:1;transform:none;}
 .pregunta.activa-preg{color:var(--blanco);}
 
-/* ── ELECCIÓN ── */
-.eleccion-wrap{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  max-width:420px;
-  width:100%;
-  margin-top:32px;
-}
-
-.btn-eleccion{
-  padding:20px 28px;
-  background:transparent;
-  border:1px solid rgba(201,168,76,0.25);
-  color:var(--blanco);
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(15px,2vw,18px);
-  font-style:italic;
-  font-weight:300;
-  cursor:pointer;
-  text-align:left;
-  transition:all 0.25s ease;
-  position:relative;
-  overflow:hidden;
-}
-
-.btn-eleccion::before{
-  content:'';
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:0;
-  background:var(--oro2);
-  transition:width 0.3s ease;
-}
-
+/* BOTONES */
+.eleccion-wrap{display:flex;flex-direction:column;gap:10px;max-width:400px;width:100%;margin-top:24px;}
+.btn-eleccion{padding:17px 22px;background:transparent;border:1px solid rgba(201,168,76,0.18);color:var(--blanco);font-family:'Cormorant Garamond',serif;font-size:clamp(14px,2vw,17px);font-style:italic;font-weight:300;cursor:pointer;text-align:left;transition:all 0.25s ease;position:relative;overflow:hidden;}
+.btn-eleccion::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(201,168,76,0.08);transition:width 0.3s ease;}
 .btn-eleccion:hover::before{width:100%;}
-.btn-eleccion:hover{border-color:var(--oro);color:var(--blanco);}
+.btn-eleccion:hover{border-color:rgba(201,168,76,0.4);}
 .btn-eleccion span{position:relative;z-index:1;}
+.btn-eleccion.principal{border-color:rgba(201,168,76,0.4);color:var(--oro);}
 
-.btn-eleccion.principal{
-  border-color:var(--oro);
-  color:var(--oro);
-}
-.btn-eleccion.principal::before{background:rgba(201,168,76,0.08);}
+/* CAMINO NO */
+.no-box{max-width:520px;width:100%;padding:24px 28px;border:1px solid rgba(201,168,76,0.08);background:rgba(201,168,76,0.02);}
+.no-voz{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2.2vw,20px);font-style:italic;font-weight:300;color:var(--gris);line-height:1.8;margin-bottom:16px;}
+.no-voz strong{color:var(--blanco);font-weight:300;}
 
-/* ── BARRA DE PROGRESO ── */
-#progreso-wrap{
-  position:fixed;
-  top:0;left:0;right:0;
-  height:2px;
-  background:rgba(201,168,76,0.08);
-  z-index:100;
+/* AUDIO PLAYER */
+#audio-indicator{
+  position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:8px;
+  opacity:0;transition:opacity 0.6s ease;
+  pointer-events:none;z-index:10;
 }
-#progreso-barra{
-  height:100%;
-  background:var(--oro);
-  width:0%;
-  transition:width 0.5s ease;
+#audio-indicator.visible{opacity:1;}
+.audio-bar{
+  width:3px;background:var(--oro);border-radius:2px;
+  animation:audiobar 0.8s ease-in-out infinite alternate;
 }
+.audio-bar:nth-child(1){height:8px;animation-delay:0s;}
+.audio-bar:nth-child(2){height:14px;animation-delay:0.15s;}
+.audio-bar:nth-child(3){height:20px;animation-delay:0.05s;}
+.audio-bar:nth-child(4){height:14px;animation-delay:0.2s;}
+.audio-bar:nth-child(5){height:8px;animation-delay:0.1s;}
+@keyframes audiobar{from{transform:scaleY(0.4);}to{transform:scaleY(1);}}
 
-/* ── NÚMERO DE PASO ── */
-#paso-actual{
-  position:fixed;
-  bottom:28px;right:28px;
-  font-family:'Cinzel',serif;
-  font-size:9px;
-  letter-spacing:4px;
-  color:var(--gris2);
-  z-index:100;
-}
+/* PROGRESO */
+#progreso-wrap{position:fixed;top:0;left:0;right:0;height:1px;background:rgba(201,168,76,0.06);z-index:100;}
+#progreso-barra{height:100%;background:rgba(201,168,76,0.4);width:0%;transition:width 0.6s ease;}
 
-/* ── REVEAL VERSIONADO ── */
-.reveal-item{
-  opacity:0;
-  transform:translateY(16px);
-  transition:opacity 0.5s ease, transform 0.5s ease;
-}
+/* PLANES */
+.planes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(201,168,76,0.08);max-width:740px;width:100%;margin-top:24px;}
+.plan{background:#050505;padding:22px 18px;display:flex;flex-direction:column;transition:background 0.2s;}
+.plan:hover{background:#0a0a0a;}
+.plan.destacado{background:#080808;}
+.plan-nombre{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:var(--oro);text-transform:uppercase;margin-bottom:12px;}
+.plan-precio{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--blanco);line-height:1;margin-bottom:4px;}
+.plan-precio sup{font-size:12px;vertical-align:super;}
+.plan-desc{font-size:11px;color:var(--gris);margin-bottom:14px;letter-spacing:1px;}
+.plan-items{list-style:none;flex:1;margin-bottom:18px;}
+.plan-items li{font-size:11px;color:var(--gris);padding:5px 0;border-bottom:1px solid rgba(201,168,76,0.04);line-height:1.5;}
+.btn-plan{display:block;text-align:center;padding:12px;border:1px solid rgba(201,168,76,0.2);color:var(--oro);font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;text-decoration:none;transition:all 0.2s;}
+.btn-plan:hover{background:rgba(201,168,76,0.06);border-color:rgba(201,168,76,0.4);}
+.plan.destacado .btn-plan{background:rgba(201,168,76,0.9);color:#050505;border-color:transparent;}
+
+/* SEBASTIÁN */
+.sebastian-wrap{display:flex;gap:28px;align-items:center;max-width:660px;width:100%;}
+.sebastian-img{width:130px;min-width:130px;filter:grayscale(25%);opacity:0.9;border:1px solid rgba(201,168,76,0.1);}
+.firma{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;font-weight:300;color:var(--blanco);margin-top:12px;padding-top:12px;border-top:1px solid rgba(201,168,76,0.1);}
+
+.reveal-item{opacity:0;transform:translateY(12px);transition:opacity 0.6s ease,transform 0.6s ease;}
 .reveal-item.show{opacity:1;transform:none;}
 
-/* ── PLANES ── */
-.planes-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:1px;
-  background:rgba(201,168,76,0.1);
-  max-width:780px;
-  width:100%;
-  margin-top:32px;
-}
+#paso-actual{position:fixed;bottom:24px;right:24px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:var(--gris2);z-index:100;}
 
-.plan{
-  background:var(--negro);
-  padding:28px 24px;
-  display:flex;
-  flex-direction:column;
-  transition:background 0.2s;
-  cursor:pointer;
-}
-.plan:hover{background:#0a0a0a;}
-.plan.destacado{background:#0c0c0c;}
-
-.plan-nombre{
-  font-family:'Cinzel',serif;
-  font-size:9px;
-  letter-spacing:4px;
-  color:var(--oro);
-  text-transform:uppercase;
-  margin-bottom:16px;
-}
-
-.plan-precio{
-  font-family:'Cormorant Garamond',serif;
-  font-size:36px;
-  font-weight:300;
-  color:var(--blanco);
-  line-height:1;
-  margin-bottom:4px;
-}
-.plan-precio sup{font-size:14px;vertical-align:super;}
-
-.plan-desc{
-  font-size:11px;
-  color:var(--gris);
-  margin-bottom:20px;
-  letter-spacing:1px;
-}
-
-.plan-items{
-  list-style:none;
-  flex:1;
-  margin-bottom:24px;
-}
-.plan-items li{
-  font-size:12px;
-  color:var(--gris);
-  padding:6px 0;
-  border-bottom:1px solid rgba(201,168,76,0.05);
-  line-height:1.5;
-}
-
-.btn-plan{
-  display:block;
-  text-align:center;
-  padding:14px;
-  border:1px solid rgba(201,168,76,0.25);
-  color:var(--oro);
-  font-family:'Cinzel',serif;
-  font-size:9px;
-  letter-spacing:4px;
-  text-transform:uppercase;
-  text-decoration:none;
-  transition:all 0.2s;
-}
-.btn-plan:hover{background:var(--oro2);border-color:var(--oro);}
-.plan.destacado .btn-plan{background:var(--oro);color:var(--negro);border-color:var(--oro);}
-.plan.destacado .btn-plan:hover{background:rgba(201,168,76,0.85);}
-
-/* ── SEBASTIÁN ── */
-.sebastian-wrap{
-  display:flex;
-  gap:40px;
-  align-items:center;
-  max-width:700px;
-  width:100%;
-}
-.sebastian-img{
-  width:160px;
-  min-width:160px;
-  filter:grayscale(20%);
-  border:1px solid rgba(201,168,76,0.15);
-}
-.sebastian-texto .firma{
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px;
-  font-style:italic;
-  font-weight:300;
-  color:var(--blanco);
-  margin-top:16px;
-  padding-top:16px;
-  border-top:1px solid rgba(201,168,76,0.15);
-}
-
-/* ── FONDO PARTÍCULAS ── */
-#canvas-bg{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-  opacity:0.4;
-}
-
-.pantalla{z-index:1;}
-#progreso-wrap,#paso-actual{z-index:10;}
-
-/* ── MOBILE ── */
 @media(max-width:600px){
   .planes-grid{grid-template-columns:1fr;}
   .sebastian-wrap{flex-direction:column;text-align:center;}
-  .sebastian-img{width:120px;min-width:120px;}
+  .sebastian-img{width:100px;min-width:100px;}
 }
-
-@media(prefers-reduced-motion:reduce){
-  *{transition:none!important;animation:none!important;}
-}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
 </style>
 </head>
 <body>
 
-<canvas id="canvas-bg"></canvas>
+<!-- FONDO ESPIRAL FIBONACCI -->
+<canvas id="spiral-bg"></canvas>
+
+<!-- INDICADOR DE AUDIO -->
+<div id="audio-indicator">
+  <div class="audio-bar"></div>
+  <div class="audio-bar"></div>
+  <div class="audio-bar"></div>
+  <div class="audio-bar"></div>
+  <div class="audio-bar"></div>
+</div>
 
 <div id="progreso-wrap"><div id="progreso-barra"></div></div>
 <div id="paso-actual"></div>
 
+<!-- ENTRADA — desbloquea audio -->
+<div id="entrada" style="position:fixed;inset:0;z-index:999;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;" onclick="desbloquear()">
+  <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:8px;color:rgba(201,168,76,0.4);text-transform:uppercase;margin-bottom:32px">Sebastián Borja</div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(32px,6vw,64px);font-weight:300;color:#F4EFE6;text-align:center;line-height:1.1">El Sueño<br><em style="color:#C9A84C">Suspendido</em></div>
+  <div style="width:1px;height:40px;background:linear-gradient(to bottom,transparent,rgba(201,168,76,0.4),transparent);margin:32px auto"></div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(201,168,76,0.5);letter-spacing:2px;animation:pulseIn 2s ease infinite">tocá para comenzar</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:28px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:rgba(201,168,76,0.3);text-transform:uppercase">experiencia con audio</span>
+    </div>
+    <!-- animación volumen triangulo 5 barras + icono parlante reactivo -->
+    <div style="display:flex;align-items:flex-end;gap:4px;height:28px;position:relative;">
+      <div class="vbar" id="vb1"></div>
+      <div class="vbar" id="vb2"></div>
+      <div class="vbar" id="vb3"></div>
+      <div class="vbar" id="vb4"></div>
+      <div class="vbar" id="vb5"></div>
+      <!-- auricular reactivo al nivel -->
+      <div style="margin-left:8px;margin-bottom:2px;position:relative;width:20px;height:20px;">
+        <!-- apagado -->
+        <svg id="spk-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="1.2" stroke-linecap="round" style="position:absolute;top:0;left:0;transition:opacity 0.4s">
+          <path d="M3 18v-6a9 9 0 0118 0v6"/>
+          <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+        </svg>
+        <!-- medio -->
+        <svg id="spk-mid" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.45)" stroke-width="1.2" stroke-linecap="round" style="position:absolute;top:0;left:0;opacity:0;transition:opacity 0.4s">
+          <path d="M3 18v-6a9 9 0 0118 0v6"/>
+          <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+        </svg>
+        <!-- encendido -->
+        <svg id="spk-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.75)" stroke-width="1.2" stroke-linecap="round" style="position:absolute;top:0;left:0;opacity:0;transition:opacity 0.4s">
+          <path d="M3 18v-6a9 9 0 0118 0v6"/>
+          <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+<style>
+.vbar{
+  width:3px;
+  border-radius:0;
+  background:rgba(201,168,76,1);
+  transform-origin:bottom;
+  opacity:0;
+}
+/* alturas base en triángulo — sube de izquierda a derecha */
+#vb1{height:6px;}
+#vb2{height:10px;}
+#vb3{height:15px;}
+#vb4{height:20px;}
+#vb5{height:26px;}
+</style>
+<script>
+(function(){
+  var bars=[
+    document.getElementById('vb1'),
+    document.getElementById('vb2'),
+    document.getElementById('vb3'),
+    document.getElementById('vb4'),
+    document.getElementById('vb5')
+  ];
+  var spkOff=document.getElementById('spk-off');
+  var spkMid=document.getElementById('spk-mid');
+  var spkOn=document.getElementById('spk-on');
+  // alturas base del triángulo
+  var baseH=[6,10,15,20,26];
+  // canon — cada barra se enciende y apaga en secuencia con desfase
+  // desfase entre barras: 0.3s
+  var DESFASE=0.35;
+  var CICLO=2.2; // duración de un ciclo completo en segundos
+  var startTime=null;
+
+  function animVol(ts){
+    if(!startTime) startTime=ts;
+    var elapsed=(ts-startTime)/1000;
+
+    bars.forEach(function(b,i){
+      // cada barra tiene su propia fase en el canon
+      var t=((elapsed - i*DESFASE) % CICLO + CICLO) % CICLO;
+      // sube suave (0→1) en la primera mitad, baja (1→0) en la segunda
+      var fase=t/CICLO;
+      var alpha;
+      if(fase<0.5){
+        // fade in suave
+        alpha=Math.sin(fase*Math.PI)*0.5;
+      } else {
+        // fade out suave
+        alpha=Math.sin(fase*Math.PI)*0.5;
+      }
+      // asegurar que nunca quede nada encendido en el mínimo
+      b.style.opacity=Math.max(alpha,0)+'';
+      b.style.height=baseH[i]+'px';
+    });
+
+    // parlante: nivel global = promedio de las barras
+    var elapsed2=elapsed/CICLO;
+    var nivelGlobal=(Math.sin(elapsed2*Math.PI*2)+1)/2;
+    if(nivelGlobal<0.33){
+      spkOff.style.opacity='0.4';spkMid.style.opacity='0';spkOn.style.opacity='0';
+    } else if(nivelGlobal<0.66){
+      spkOff.style.opacity='0';spkMid.style.opacity='0.4';spkOn.style.opacity='0';
+    } else {
+      spkOff.style.opacity='0';spkMid.style.opacity='0';spkOn.style.opacity='0.4';
+    }
+    requestAnimationFrame(animVol);
+  }
+  requestAnimationFrame(animVol);
+})();
+</script>
+</div>
+<style>@keyframes pulseIn{0%,100%{opacity:0.4;}50%{opacity:1;}}</style>
+
 <div id="experiencia">
 
-  <!-- PANTALLA 0: ENTRADA -->
-  <div class="pantalla activa" id="p0">
-    <div class="eyebrow reveal-item">Una historia</div>
-    <div class="numero-grande" id="num-inicio">8</div>
-    <div class="linea"></div>
-    <p class="subtitulo reveal-item" style="margin-top:0">
-      Hubo una vez una persona destinada al fracaso.<br>
-      <strong>No porque no pudiera. Sino porque alguien decidió que su máximo era ocho.</strong>
-    </p>
-    <div style="margin-top:40px" class="reveal-item">
-      <button class="btn-eleccion principal" onclick="avanzar(1)">
-        <span>Quiero escuchar la historia →</span>
-      </button>
-    </div>
+<!-- P0 -->
+<div class="pantalla activa" id="p0">
+  <div class="eyebrow reveal-item">Una historia</div>
+  <div class="numero-grande" id="num-inicio">8</div>
+  <div class="linea"></div>
+  <p class="subtitulo reveal-item" style="margin-top:0">
+    Hubo una vez una persona destinada al fracaso.<br>
+    <strong>No porque no pudiera. Sino porque alguien decidió que su máximo era ocho.</strong>
+  </p>
+  <div style="margin-top:32px" class="reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p1')"><span>Quiero escuchar la historia →</span></button>
   </div>
-
-  <!-- PANTALLA 1: LA HISTORIA DEL 8 -->
-  <div class="pantalla" id="p1">
-    <div class="eyebrow">La historia</div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:580px;width:100%">
-      <div class="numero-grande" id="num8" style="font-size:clamp(60px,12vw,120px)">8</div>
-      <p class="subtitulo" style="margin-top:0;text-align:center" id="historia-texto">
-        Se esforzó día tras día. Alcanzó carreras, trabajos, posesiones.<br>
-        Pero siempre era un <strong>ocho</strong>. Nunca su diez.<br>
-        Porque en el fondo creía estar destinado a ser un ocho.
-      </p>
-      <div class="linea"></div>
-      <div id="descenso-wrap" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;justify-content:center;opacity:0;transition:opacity 0.8s ease">
-        <span class="numero-tachado" style="font-size:clamp(28px,5vw,52px)">8</span>
-        <span style="color:var(--gris);font-size:20px">→</span>
-        <span class="numero-tachado" style="font-size:clamp(28px,5vw,52px)">6</span>
-        <span style="color:var(--gris);font-size:20px">→</span>
-        <span class="numero-tachado" style="font-size:clamp(28px,5vw,52px)">4</span>
-        <span style="color:var(--gris);font-size:20px">→</span>
-        <span style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,52px);font-weight:300;color:var(--oro)">0.5</span>
-      </div>
-      <p class="subtitulo" id="final-historia" style="margin-top:0;opacity:0;transition:opacity 0.8s ease">
-        Murió siendo <strong>cero coma cinco</strong>.<br>No porque no pudiera más. Sino porque dejó de decidir que podía.
-      </p>
-      <div id="btn-p1" style="opacity:0;transition:opacity 0.8s ease;margin-top:8px">
-        <button class="btn-eleccion principal" onclick="avanzar(2)">
-          <span>Seguir →</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PANTALLA 2: LAS PREGUNTAS -->
-  <div class="pantalla" id="p2">
-    <div class="eyebrow">Y vos</div>
-    <div class="pregunta-wrap" id="preguntas-wrap">
-      <p class="pregunta" data-delay="0">¿En dónde estás vos?</p>
-      <p class="pregunta" data-delay="600">¿Cuál es tu máximo?</p>
-      <p class="pregunta" data-delay="1200">¿Cuándo dejaste de soñar?</p>
-      <p class="pregunta" data-delay="1800">¿Cuándo dejaste de buscar?</p>
-      <p class="pregunta" data-delay="2400">¿Por qué decidiste que ya no podías?</p>
-      <p class="pregunta" data-delay="3200" style="color:var(--oro)">¿Quién puso esa voz dentro tuyo?</p>
-    </div>
-    <div id="btn-p2" style="opacity:0;transition:opacity 0.8s ease;margin-top:32px">
-      <button class="btn-eleccion principal" onclick="avanzar(3)">
-        <span>Quiero saberlo →</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- PANTALLA 3: EL AEF REVELADO -->
-  <div class="pantalla" id="p3">
-    <div class="eyebrow">Lo que nadie te dijo</div>
-    <h2 class="titulo reveal-item">
-      No fuiste vos.<br>
-      Fue <em>él</em>.
-    </h2>
-    <div class="linea"></div>
-    <p class="subtitulo reveal-item">
-      Hay una versión tuya que se formó en el momento más doloroso de tu vida. Aprendió a protegerte. Construyó un castillo. Y desde ahí lleva años tomando decisiones por vos — para que nadie vuelva a lastimarte.
-    </p>
-    <p class="subtitulo reveal-item" style="margin-top:16px">
-      Lo llamamos el <strong>Alter Ego Fracasado</strong>.<br>
-      No es tu enemigo. Es tu guardián. Pero ya no lo necesitás.
-    </p>
-    <div style="margin-top:36px" class="reveal-item">
-      <div class="eleccion-wrap" style="margin-top:0">
-        <button class="btn-eleccion principal" onclick="avanzar(4)">
-          <span>Quiero ver ese castillo →</span>
-        </button>
-        <button class="btn-eleccion" onclick="avanzar(4)">
-          <span>Seguir mirando...</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PANTALLA 4: EL CASTILLO -->
-  <div class="pantalla" id="p4">
-    <div class="eyebrow">El castillo</div>
-    <h2 class="titulo reveal-item">
-      Ya estás<br>
-      <em>afuera del castillo.</em>
-    </h2>
-    <div class="linea"></div>
-    <p class="subtitulo reveal-item">
-      Tu decisión te trajo hasta acá. Pero el AEF todavía vive adentro. Para salir del ciclo no alcanza con querer salir. Hay que entrar al castillo y sanar lo que quedó ahí.
-    </p>
-    <p class="subtitulo reveal-item" style="margin-top:16px;font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,24px);font-style:italic;color:var(--blanco)">
-      Hay un camino para lograrlo.<br>¿Querés saber cuál es?
-    </p>
-    <div class="eleccion-wrap reveal-item" style="margin-top:32px">
-      <button class="btn-eleccion principal" onclick="avanzar(5)">
-        <span>Quiero ser sano →</span>
-      </button>
-      <button class="btn-eleccion" onclick="avanzar(5)">
-        <span>Prefiero dejarlo para después...</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- PANTALLA 5: LA PAUSA -->
-  <div class="pantalla" id="p5">
-    <div class="eyebrow">Un momento</div>
-    <h2 class="titulo reveal-item">
-      <em>Pausa.</em>
-    </h2>
-    <div class="linea"></div>
-    <div id="tiempo-wrap" class="reveal-item" style="text-align:center;padding:24px 32px;border:1px solid rgba(201,168,76,0.15);max-width:360px">
-      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:5px;color:var(--gris);margin-bottom:12px">TIEMPO AQUÍ</div>
-      <div id="tiempo-display" style="font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;color:var(--blanco);line-height:1"></div>
-      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--gris);margin-top:8px">MINUTOS</div>
-    </div>
-    <p class="subtitulo reveal-item" style="margin-top:24px">
-      No te diste cuenta.<br>
-      <strong>Igual que en tu vida.</strong><br>
-      El tiempo pasa. El ciclo sigue. Y el sueño espera.
-    </p>
-    <div style="margin-top:32px" class="reveal-item">
-      <button class="btn-eleccion principal" onclick="avanzar(6)">
-        <span>Ya entendí. ¿Cuál es el camino? →</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- PANTALLA 6: LA SOLUCIÓN -->
-  <div class="pantalla" id="p6">
-    <div class="eyebrow">El paso de hoy</div>
-    <h2 class="titulo reveal-item">
-      Identificar<br><em>quién decide por vos.</em>
-    </h2>
-    <div class="linea"></div>
-    <p class="subtitulo reveal-item">
-      La única forma de sanar al AEF es detenerse un momento y sanar esa herida profunda. En este libro encontrás la técnica exacta para hacer ese trabajo y salir de esa situación para siempre.
-    </p>
-    <p class="subtitulo reveal-item" style="margin-top:16px;font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.2vw,22px);font-style:italic;color:var(--blanco)">
-      Pero todo depende exclusiva y puramente de vos.<br>De tu decisión. De tu elección.
-    </p>
-    <div class="eleccion-wrap reveal-item" style="margin-top:32px">
-      <button class="btn-eleccion principal" onclick="avanzar(7)">
-        <span>Quiero seguir →</span>
-      </button>
-      <button class="btn-eleccion" onclick="avanzar(7)">
-        <span>Prefiero no mirar...</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- PANTALLA 7: NO ES UNA COMPRA -->
-  <div class="pantalla" id="p7">
-    <div class="eyebrow">Antes de continuar</div>
-    <h2 class="titulo reveal-item">
-      Esto no se trata<br>
-      de <em>dinero.</em>
-    </h2>
-    <div class="linea"></div>
-    <p class="subtitulo reveal-item">
-      Se trata de elecciones. De compromiso. Este compromiso no lo asumís pagando un libro — lo asumís cuando encarnás el verdadero vos que ya quiere salir, que ya quiere dejarse ver, que ya quiere habitar la vida que todo este tiempo estuviste fantasmando.
-    </p>
-    <p class="subtitulo reveal-item" style="margin-top:16px;font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,26px);font-style:italic;color:var(--blanco)">
-      La vida que estabas esperando está en tu mano.<br>
-      Solo falta que la dejes salir.
-    </p>
-    <div style="margin-top:32px" class="reveal-item">
-      <button class="btn-eleccion principal" onclick="avanzar(8)">
-        <span>Estoy listo →</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- PANTALLA 8: SEBASTIÁN + PLANES -->
-  <div class="pantalla" id="p8" style="justify-content:flex-start;padding-top:60px;padding-bottom:60px">
-    <div class="eyebrow reveal-item" style="margin-bottom:0">Sebastián Borja</div>
-    <div class="sebastian-wrap reveal-item" style="margin-top:24px;margin-bottom:32px">
-      <img src="sebastianborja.png" alt="Sebastián Borja" class="sebastian-img">
-      <div class="sebastian-texto">
-        <p class="subtitulo" style="text-align:left;margin-top:0;font-size:14px">
-          Pasé años acompañando personas que lo tenían todo para avanzar y no podían. Construí este sistema porque lo viví. Porque conozco esa voz que cuida y paraliza al mismo tiempo.
-        </p>
-        <p class="subtitulo firma" style="text-align:left;margin-top:0">
-          "No soy el ejemplo. Soy la posibilidad."
-        </p>
-      </div>
-    </div>
-
-    <div class="eyebrow reveal-item" style="margin-bottom:16px">Elegí tu compromiso</div>
-
-    <div class="planes-grid reveal-item">
-      <div class="plan">
-        <div class="plan-nombre">Esencial</div>
-        <div class="plan-precio"><sup>USD </sup>17</div>
-        <div class="plan-desc">El libro digital</div>
-        <ul class="plan-items">
-          <li>El Sueño Suspendido PDF</li>
-          <li>Metodología AEF completa</li>
-          <li>Mapa interactivo del AEF</li>
-        </ul>
-        <a href="https://pay.hotmart.com/X105262338E?off=van91dx4&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
-      </div>
-      <div class="plan destacado">
-        <div class="plan-nombre">Profundo</div>
-        <div class="plan-precio"><sup>USD </sup>27</div>
-        <div class="plan-desc">Libro + app interactiva</div>
-        <ul class="plan-items">
-          <li>Todo lo del Esencial</li>
-          <li>App con 15 capítulos</li>
-          <li>Rueda de diagnóstico</li>
-          <li>Plan de 90 días guiado</li>
-        </ul>
-        <a href="https://pay.hotmart.com/X105262051P?off=qolhri8f&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
-      </div>
-      <div class="plan">
-        <div class="plan-nombre">Revelador</div>
-        <div class="plan-precio"><sup>USD </sup>47</div>
-        <div class="plan-desc">Experiencia completa</div>
-        <ul class="plan-items">
-          <li>Todo lo del Profundo</li>
-          <li>Prioridad en charlas futuras</li>
-          <li>Acceso a actualizaciones</li>
-          <li>Acompañamiento directo</li>
-        </ul>
-        <a href="https://pay.hotmart.com/U105301226T?off=o6eb0ag6&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
-      </div>
-    </div>
-
-    <p class="subtitulo reveal-item" style="margin-top:28px;font-size:12px;letter-spacing:1px">
-      No te vamos a guiar. El camino lo designás vos.
-    </p>
-  </div>
-
 </div>
 
+<!-- P1 -->
+<div class="pantalla" id="p1">
+  <div class="eyebrow">La historia</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;max-width:540px;width:100%">
+    <div class="numero-grande" id="num8" style="font-size:clamp(56px,12vw,100px)">8</div>
+    <p class="subtitulo" style="margin-top:0;text-align:center">
+      Se esforzó día tras día. Alcanzó carreras, trabajos, posesiones.<br>
+      Pero siempre era un <strong>ocho</strong>. Nunca su diez.
+    </p>
+    <div class="linea"></div>
+    <div id="descenso-wrap" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;opacity:0;transition:opacity 1s ease">
+      <span class="numero-tachado">8</span><span style="color:var(--gris2)">→</span>
+      <span class="numero-tachado">6</span><span style="color:var(--gris2)">→</span>
+      <span class="numero-tachado">4</span><span style="color:var(--gris2)">→</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:clamp(24px,5vw,48px);font-weight:300;color:var(--oro)">0.5</span>
+    </div>
+    <p class="subtitulo" id="final-historia" style="margin-top:0;opacity:0;transition:opacity 1s ease">
+      No porque no pudiera más.<br>Sino porque dejó de decidir que podía.
+    </p>
+    <div id="btn-p1" style="opacity:0;transition:opacity 0.8s ease;margin-top:8px">
+      <button class="btn-eleccion principal" onclick="ir('p2')"><span>Seguir →</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- P2 -->
+<div class="pantalla" id="p2">
+  <div class="eyebrow">Y vos</div>
+  <div class="pregunta-wrap" id="preguntas-wrap">
+    <p class="pregunta" data-delay="0">¿En dónde estás vos?</p>
+    <p class="pregunta" data-delay="700">¿Cuál es tu máximo?</p>
+    <p class="pregunta" data-delay="1400">¿Cuándo dejaste de soñar?</p>
+    <p class="pregunta" data-delay="2100">¿Cuándo dejaste de buscar?</p>
+    <p class="pregunta" data-delay="2800">¿Por qué decidiste que ya no podías?</p>
+    <p class="pregunta" data-delay="3600" style="color:var(--oro)">¿Quién puso esa voz dentro tuyo?</p>
+  </div>
+  <div id="btn-p2" style="opacity:0;transition:opacity 0.8s ease;margin-top:24px">
+    <div class="eleccion-wrap" style="margin-top:0">
+      <button class="btn-eleccion principal" onclick="ir('p3')"><span>Quiero saberlo →</span></button>
+      <button class="btn-eleccion" onclick="ir('pno2')"><span>No estoy listo para contarte...</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- PNO2 -->
+<div class="pantalla" id="pno2">
+  <div class="eyebrow">Entendido</div>
+  <div class="no-box reveal-item">
+    <p class="no-voz">Esa es la respuesta exacta que aparece cuando el dolor es tocado.<br><strong>Se encierra. Los muros no permiten entrar.</strong></p>
+    <p class="no-voz" style="margin-bottom:0">Si no estás listo aún, es entendible.<br>Pero si dentro de vos hay algo que te dice que hay algo más...</p>
+  </div>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p3')"><span>Quiero algo más →</span></button>
+    <button class="btn-eleccion" onclick="ir('pno2b')"><span>Seguir mirando desde afuera...</span></button>
+  </div>
+</div>
+
+<!-- PNO2B -->
+<div class="pantalla" id="pno2b">
+  <div class="eyebrow">Mirar desde afuera</div>
+  <div class="no-box reveal-item">
+    <p class="no-voz">Es la actitud exacta que tiene la herida del pasado.<br><strong>No se involucra. Para no sentir. Para no volver a ser lastimado.</strong></p>
+    <p class="no-voz" style="margin-bottom:0">Si estoy equivocado, ya no estás leyendo esto.<br>Pero si leíste esta frase es porque en el fondo decidiste que no es porque podés.<br><strong>Es porque elegís.</strong></p>
+  </div>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p3')"><span>Sigo. Quiero saber quién decide por mí →</span></button>
+  </div>
+</div>
+
+<!-- P3 -->
+<div class="pantalla" id="p3">
+  <div class="eyebrow">Lo que nadie te dijo</div>
+  <h2 class="titulo reveal-item">No fuiste vos.<br>Fue <em>él</em>.</h2>
+  <div class="linea"></div>
+  <p class="subtitulo reveal-item">Hay una versión tuya que se formó en el momento más doloroso de tu vida. Aprendió a protegerte. Construyó un castillo. Y desde ahí lleva años tomando decisiones por vos.</p>
+  <p class="subtitulo reveal-item" style="margin-top:12px">Lo llamamos el <strong>Alter Ego Fracasado</strong>.<br>No es tu enemigo. Es tu guardián. Pero ya no lo necesitás.</p>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p4')"><span>Quiero ver ese castillo →</span></button>
+    <button class="btn-eleccion" onclick="ir('pno3')"><span>Prefiero dejarlo para después...</span></button>
+  </div>
+</div>
+
+<!-- PNO3 -->
+<div class="pantalla" id="pno3">
+  <div class="eyebrow">Para después</div>
+  <div class="no-box reveal-item">
+    <p class="no-voz">El tiempo pasa.<br><strong>Y los cambios siguen sin aparecer.</strong></p>
+    <p class="no-voz" style="margin-bottom:0">Pero si seguiste leyendo hasta aquí, es porque muy dentro tuyo hay algo que sabe que hay otro lado en la puerta que estás viendo frente tuyo.<br><strong>Esa puerta es tuya. Y puede ser atravesada.</strong></p>
+  </div>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p4')"><span>Quiero pasar al otro lado →</span></button>
+  </div>
+</div>
+
+<!-- P4 -->
+<div class="pantalla" id="p4">
+  <div class="eyebrow">El castillo</div>
+  <h2 class="titulo reveal-item">Ya estás<br><em>afuera del castillo.</em></h2>
+  <div class="linea"></div>
+  <p class="subtitulo reveal-item">Tu decisión te trajo hasta acá. Pero el AEF todavía vive adentro. Para salir del ciclo no alcanza con querer salir. Hay que entrar al castillo y sanar lo que quedó ahí.</p>
+  <p class="subtitulo reveal-item" style="margin-top:12px;font-family:'Cormorant Garamond',serif;font-size:clamp(17px,2.5vw,22px);font-style:italic;color:var(--blanco)">¿Querés saber cómo?</p>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p5')"><span>Quiero ser sano →</span></button>
+    <button class="btn-eleccion" onclick="ir('pno4')"><span>Prefiero dejarlo para después...</span></button>
+  </div>
+</div>
+
+<!-- PNO4 -->
+<div class="pantalla" id="pno4">
+  <div class="eyebrow">Después</div>
+  <div class="no-box reveal-item">
+    <p class="no-voz">Después.<br><strong>Esa palabra le pertenece al AEF.</strong></p>
+    <p class="no-voz" style="margin-bottom:0">Pero vos ya estás afuera. Ya diste el primer paso.<br>Y dentro tuyo algo sabe que el único momento que existe<br><strong>es este.</strong></p>
+  </div>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p5')"><span>Quiero ser sano →</span></button>
+  </div>
+</div>
+
+<!-- P5 -->
+<div class="pantalla" id="p5">
+  <div class="eyebrow">Un momento</div>
+  <h2 class="titulo reveal-item"><em>Pausa.</em></h2>
+  <div class="linea"></div>
+  <div class="reveal-item" style="text-align:center;padding:20px 28px;border:1px solid rgba(201,168,76,0.1);max-width:320px">
+    <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:5px;color:rgba(201,168,76,0.7);margin-bottom:8px">TIEMPO AQUÍ</div>
+    <div id="tiempo-display" style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:rgba(201,168,76,0.5);line-height:1"></div>
+    <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:rgba(201,168,76,0.7);margin-top:6px">MINUTOS</div>
+  </div>
+  <p class="subtitulo reveal-item" style="margin-top:18px">No te diste cuenta.<br><strong>Igual que en tu vida.</strong><br>El tiempo pasa. El ciclo sigue. Y el sueño espera.</p>
+  <div style="margin-top:24px" class="reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p6')"><span>¿Cuál es el camino? →</span></button>
+  </div>
+</div>
+
+<!-- P6 -->
+<div class="pantalla" id="p6">
+  <div class="eyebrow">El paso de hoy</div>
+  <h2 class="titulo reveal-item">Identificar<br><em>quién decide por vos.</em></h2>
+  <div class="linea"></div>
+  <p class="subtitulo reveal-item">La única forma de sanar al AEF es detenerse un momento y sanar esa herida profunda. En este libro encontrás la técnica exacta para hacer ese trabajo y comenzar el único cambio que es definitivo: el que ocurre adentro. Porque una vez que lo ves, ya no podés no verlo.</p>
+  <p class="subtitulo reveal-item" style="margin-top:12px;font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.2vw,21px);font-style:italic;color:var(--blanco)">Pero todo depende exclusiva y puramente de vos.</p>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p7')"><span>Quiero seguir →</span></button>
+    <button class="btn-eleccion" onclick="ir('pno6')"><span>Prefiero no mirar...</span></button>
+  </div>
+</div>
+
+<!-- PNO6 -->
+<div class="pantalla" id="pno6">
+  <div class="eyebrow">No mirar</div>
+  <div class="no-box reveal-item">
+    <p class="no-voz">Decidir no saber no es ignorancia.<br><strong>Es ocultamiento.</strong></p>
+    <p class="no-voz" style="margin-bottom:0">Si estoy equivocado, ya no estás leyendo esto.<br>Pero si leés esta palabra es porque algo dentro tuyo<br><strong>está gritando por un cambio.</strong></p>
+  </div>
+  <div class="eleccion-wrap reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p7')"><span>Quiero un cambio →</span></button>
+  </div>
+</div>
+
+<!-- P7 -->
+<div class="pantalla" id="p7">
+  <div class="eyebrow">Antes de continuar</div>
+  <h2 class="titulo reveal-item">Esto no se trata<br>de <em>dinero.</em></h2>
+  <div class="linea"></div>
+  <p class="subtitulo reveal-item">Se trata de elecciones. De compromiso. Este compromiso no lo asumís pagando un libro — lo asumís cuando encarnás el verdadero vos que ya quiere salir, que ya quiere dejarse ver.</p>
+  <p class="subtitulo reveal-item" style="margin-top:12px">La vida que estabas esperando no está lejos. Está frente a tus ojos. La ves todos los días. La sentís cerca. Pero algo en vos la mira desde afuera, <strong>como si vos fueras el testigo de tu propia historia, y no su protagonista.</strong></p>
+  <div style="margin-top:24px" class="reveal-item">
+    <button class="btn-eleccion principal" onclick="ir('p8')"><span>Estoy listo →</span></button>
+  </div>
+</div>
+
+<!-- P8 -->
+<div class="pantalla" id="p8" style="justify-content:flex-start;padding-top:48px;padding-bottom:48px">
+  <div class="eyebrow reveal-item" style="margin-bottom:0">Sebastián Borja</div>
+  <div class="sebastian-wrap reveal-item" style="margin-top:18px;margin-bottom:24px">
+    <img src="sebastianborja.png" alt="Sebastián Borja" class="sebastian-img">
+    <div>
+      <p class="subtitulo" style="text-align:left;margin-top:0;font-size:13px">Pasé años acompañando personas que lo tenían todo para avanzar y no podían. Construí este sistema porque lo viví. Porque conozco esa voz que cuida y paraliza al mismo tiempo.</p>
+      <p class="firma">"No soy el ejemplo. Soy la posibilidad."</p>
+      <p style="font-size:11px;color:rgba(201,168,76,0.3);line-height:1.7;margin-top:16px;font-family:'Lato',sans-serif;font-weight:300;font-style:normal;">El Sueño Suspendido es una herramienta de desarrollo personal basada en experiencia de vida compartida. Suma a cualquier proceso y no reemplaza el acompañamiento de un profesional de la salud mental. Si estás trabajando con un terapeuta, psicólogo o cualquier otro profesional, este proceso puede acompañar y potenciar ese camino.</p>
+    </div>
+  </div>
+  <div class="eyebrow reveal-item" style="margin-bottom:12px">Elegí tu compromiso</div>
+  <div class="planes-grid reveal-item">
+    <div class="plan">
+      <div class="plan-nombre">Esencial</div>
+      <div class="plan-precio"><sup>USD </sup>17</div>
+      <div class="plan-desc">El libro digital</div>
+      <ul class="plan-items"><li>El Sueño Suspendido PDF</li><li>Metodología AEF completa</li><li>Mapa interactivo del AEF</li></ul>
+      <a href="https://pay.hotmart.com/X105262338E?off=van91dx4&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
+    </div>
+    <div class="plan destacado">
+      <div class="plan-nombre">Profundo</div>
+      <div class="plan-precio"><sup>USD </sup>27</div>
+      <div class="plan-desc">Libro + app interactiva</div>
+      <ul class="plan-items"><li>Todo lo del Esencial</li><li>App con 15 capítulos</li><li>Rueda de diagnóstico</li><li>Plan de 90 días guiado</li></ul>
+      <a href="https://pay.hotmart.com/X105262051P?off=qolhri8f&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
+    </div>
+    <div class="plan">
+      <div class="plan-nombre">Revelador</div>
+      <div class="plan-precio"><sup>USD </sup>47</div>
+      <div class="plan-desc">Experiencia completa</div>
+      <ul class="plan-items"><li>Todo lo del Profundo</li><li>Prioridad en charlas futuras</li><li>Acceso a actualizaciones</li><li>Acompañamiento directo</li></ul>
+      <a href="https://pay.hotmart.com/U105301226T?off=o6eb0ag6&checkoutMode=10&hotfeature=51" class="btn-plan" target="_blank">Entrar</a>
+    </div>
+  </div>
+  <p class="subtitulo reveal-item" style="margin-top:16px;font-size:11px;letter-spacing:1px">No te vamos a guiar. El camino lo designás vos.</p>
+</div>
+
+</div><!-- fin experiencia -->
+
 <script>
-// ── ESTADO ──────────────────────────────────────────
-const TOTAL = 9;
-let pantallaActual = 0;
-let tiempoInicio = Date.now();
+// ── ESPIRAL FIBONACCI ────────────────────────────────
+var cv=document.getElementById('spiral-bg');
+var g=cv.getContext('2d');
+var PHI=(1+Math.sqrt(5))/2;
+var GA=Math.PI*2*(1-1/PHI);
+var FIB=(function(){
+  var s=[1,1];
+  while(s.length<120){var l=s.length;s.push(s[l-1]+s[l-2]);}
+  return s.filter(function(v){return v%3!==0;});
+})();
+var sfi=0,st=0,szoom=1,srot=0;
+var SVMAX=4.5,SVVEL=0.004;
+var scx=0,scy=0,sdx=0,sdy=0;
+var snumTxt='',snumA=0;
+var scapas=[{cx:0,cy:0,r:1,alpha:1}];
 
-// ── CANVAS PARTÍCULAS ────────────────────────────────
-const canvas = document.getElementById('canvas-bg');
-const ctx = canvas.getContext('2d');
-let particulas = [];
+function sResize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
+sResize();
+window.addEventListener('resize',sResize);
 
-function resizeCanvas(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+function sNuevoDest(){
+  var i=10+Math.floor(Math.random()*58);
+  var p=i/80,a=i*GA+srot,r=Math.pow(p,0.6);
+  sdx=r*Math.cos(a);sdy=r*Math.sin(a);
 }
+sNuevoDest();
 
-function crearParticulas(){
-  particulas = [];
-  for(let i=0;i<60;i++){
-    particulas.push({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      r: Math.random()*1.5+0.3,
-      vx: (Math.random()-0.5)*0.2,
-      vy: (Math.random()-0.5)*0.2,
-      alpha: Math.random()*0.4+0.1
-    });
+function sDrawEspiral(px,py,rMax,alpha){
+  if(alpha<0.01) return;
+  var W=cv.width,H=cv.height;
+  var n=140,pts=[];
+  for(var i=0;i<n;i++){
+    var p=i/n,a=i*GA+srot,r=Math.pow(p,0.55)*rMax;
+    pts.push({x:px+r*Math.cos(a),y:py+r*Math.sin(a),p:p});
+  }
+  for(var i=1;i<n;i++){
+    var p=pts[i].p;
+    g.beginPath();g.moveTo(pts[i-1].x,pts[i-1].y);g.lineTo(pts[i].x,pts[i].y);
+    g.strokeStyle='rgba(201,168,76,'+(0.012+0.025*p)*alpha+')';
+    g.lineWidth=0.3+p*0.3;g.stroke();
+  }
+  for(var i=0;i<n;i++){
+    var pt=pts[i];
+    var pulso=(Math.sin(st*0.014+i*0.31)+1)/2;
+    var tam=(0.2+1.8*pt.p)*pulso;
+    var al=(0.015+0.15*pt.p)*pulso*alpha;
+    if(al<0.005||tam<0.1) continue;
+    g.beginPath();g.arc(pt.x,pt.y,tam,0,Math.PI*2);
+    g.fillStyle='rgba(201,168,76,'+Math.min(al,0.28)+')';g.fill();
   }
 }
 
-function animarParticulas(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particulas.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy;
-    if(p.x<0)p.x=canvas.width;
-    if(p.x>canvas.width)p.x=0;
-    if(p.y<0)p.y=canvas.height;
-    if(p.y>canvas.height)p.y=0;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(201,168,76,${p.alpha})`;
-    ctx.fill();
+function sDraw(){
+  var W=cv.width,H=cv.height,MX=W/2,MY=H/2;
+  g.fillStyle='rgba(5,5,5,0.06)';g.fillRect(0,0,W,H);
+  srot+=0.0015;
+  var sc=Math.min(W,H)*0.44;
+  for(var c=0;c<scapas.length;c++){
+    var capa=scapas[c];
+    var px=MX+(capa.cx-scx)*szoom*sc;
+    var py=MY+(capa.cy-scy)*szoom*sc;
+    var rPx=capa.r*szoom*sc;
+    if(rPx>4&&rPx<W*5) sDrawEspiral(px,py,rPx,capa.alpha);
+  }
+  var dpx=MX+(sdx-scx)*szoom*sc;
+  var dpy=MY+(sdy-scy)*szoom*sc;
+  for(var h=4;h>=1;h--){
+    g.beginPath();g.arc(dpx,dpy,2+h*3,0,Math.PI*2);
+    g.strokeStyle='rgba(201,168,76,'+(0.02/h)+')';g.lineWidth=0.3;g.stroke();
+  }
+  if(snumA>0){
+    g.save();g.font='100 22px Georgia';
+    g.fillStyle='rgba(201,168,76,'+snumA*0.018+')';
+    g.textAlign='center';g.textBaseline='middle';
+    g.fillText(snumTxt,MX,MY);g.restore();
+    snumA=Math.max(0,snumA-0.004);
+  }
+  scx+=(sdx-scx)*0.008;scy+=(sdy-scy)*0.008;
+  szoom*=(1+SVVEL);
+  if(szoom>=SVMAX){
+    var s=1/SVMAX;
+    for(var c=0;c<scapas.length;c++){
+      scapas[c].cx=(scapas[c].cx-scx)*s;scapas[c].cy=(scapas[c].cy-scy)*s;
+      scapas[c].r*=s;scapas[c].alpha*=0.3;
+    }
+    scapas=scapas.filter(function(c){return c.alpha>0.02;});
+    scapas.push({cx:0,cy:0,r:1,alpha:0});
+    var nc=scapas[scapas.length-1];
+    var ft=0;
+    var fi2=setInterval(function(){ft++;nc.alpha=Math.min(ft/60,1);if(ft>=60)clearInterval(fi2);},16);
+    snumTxt=''+FIB[sfi%FIB.length];snumA=1;sfi++;
+    scx=0;scy=0;szoom=1;sNuevoDest();
+  }
+  st++;requestAnimationFrame(sDraw);
+}
+sDraw();
+
+// ── AUDIO ────────────────────────────────────────────
+var audios={};
+var audioActual=null;
+
+// Mapeo pantalla → archivo de audio
+var audioMap={
+  'p0':'audio01','p1':'audio02','p2':'audio03',
+  'pno2':'audio05','pno2b':'audio06',
+  'p3':'audio04','pno3':'audio08','p4':'audio07',
+  'pno4':'audio08','p5':'audio09','p6':'audio10',
+  'pno6':'audio11','p7':'audio12','p8':null
+};
+
+function precargarAudios(){
+  var nombres=['audio01','audio02','audio03','audio04','audio05',
+               'audio06','audio07','audio08','audio09','audio10','audio11','audio12'];
+  nombres.forEach(function(n){
+    var a=new Audio(n+'.mp3');
+    a.preload='auto';
+    audios[n]=a;
   });
-  requestAnimationFrame(animarParticulas);
+}
+precargarAudios();
+
+function playAudio(pantalla){
+  // detener audio anterior
+  if(audioActual){
+    audioActual.pause();
+    audioActual.currentTime=0;
+  }
+  var nombre=audioMap[pantalla];
+  if(!nombre) return;
+  var a=audios[nombre];
+  if(!a) return;
+  audioActual=a;
+  a.currentTime=0;
+  var ind=document.getElementById('audio-indicator');
+  a.play().then(function(){
+    ind.classList.add('visible');
+    a.onended=function(){ind.classList.remove('visible');};
+  }).catch(function(){
+    // autoplay bloqueado — silencioso
+    ind.classList.remove('visible');
+  });
 }
 
-resizeCanvas();
-crearParticulas();
-animarParticulas();
-window.addEventListener('resize',()=>{resizeCanvas();crearParticulas();});
 
-// ── PROGRESO ─────────────────────────────────────────
-function actualizarProgreso(n){
-  const pct = (n/(TOTAL-1))*100;
-  document.getElementById('progreso-barra').style.width = pct+'%';
-  document.getElementById('paso-actual').textContent = n+' · '+(TOTAL-1);
+function desbloquear(){
+  var el=document.getElementById('entrada');
+  el.style.transition='opacity 0.8s ease';
+  el.style.opacity='0';
+  setTimeout(function(){el.style.display='none';},800);
+  // desbloquear audio tocando uno silencioso
+  var a=new Audio();
+  a.play().catch(function(){});
+  setTimeout(function(){playAudio('p0');},900);
 }
 
-// ── AVANZAR ──────────────────────────────────────────
-function avanzar(n){
-  const actual = document.getElementById('p'+pantallaActual);
-  const siguiente = document.getElementById('p'+n);
+// ── ESTADO ───────────────────────────────────────────
+var pantallaActual='p0';
+var tiempoInicio=Date.now();
+var ORDEN=['p0','p1','p2','p3','p4','p5','p6','p7','p8'];
+
+function actualizarProgreso(id){
+  var idx=ORDEN.indexOf(id);
+  var pct=idx>=0?(idx/(ORDEN.length-1))*100:null;
+  if(pct!==null) document.getElementById('progreso-barra').style.width=pct+'%';
+  document.getElementById('paso-actual').textContent=(idx>=0?idx+1:'·')+' · '+(ORDEN.length-1);
+}
+
+function ir(id){
+  var actual=document.getElementById(pantallaActual);
+  var siguiente=document.getElementById(id);
   if(!siguiente) return;
-
   actual.classList.remove('activa');
   siguiente.classList.add('activa');
-  pantallaActual = n;
-  actualizarProgreso(n);
-
-  // Scroll al top de la pantalla
-  siguiente.scrollTop = 0;
-
-  // Activar reveals
-  setTimeout(()=>{
-    siguiente.querySelectorAll('.reveal-item').forEach((el,i)=>{
-      setTimeout(()=>el.classList.add('show'),i*120);
+  pantallaActual=id;
+  actualizarProgreso(id);
+  siguiente.scrollTop=0;
+  setTimeout(function(){
+    siguiente.querySelectorAll('.reveal-item').forEach(function(el,i){
+      setTimeout(function(){el.classList.add('show');},i*110);
     });
-  },100);
-
-  // Lógica específica por pantalla
-  if(n===1) inicioPantalla1();
-  if(n===2) inicioPantalla2();
-  if(n===5) inicioPantalla5();
+  },80);
+  if(id==='p1') initP1();
+  if(id==='p2') initP2();
+  if(id==='p5') initP5();
+  // reproducir audio con pequeño delay para que entre la pantalla
+  setTimeout(function(){playAudio(id);},400);
 }
 
-// ── PANTALLA 0: número inicial ───────────────────────
-setTimeout(()=>{
-  const num = document.getElementById('num-inicio');
-  num.classList.add('visible');
-  document.querySelectorAll('#p0 .reveal-item').forEach((el,i)=>{
-    setTimeout(()=>el.classList.add('show'),400+i*150);
-  });
-},300);
-
-// ── PANTALLA 1: animación del descenso ───────────────
-function inicioPantalla1(){
-  const num8 = document.getElementById('num8');
-  const descenso = document.getElementById('descenso-wrap');
-  const finalH = document.getElementById('final-historia');
-  const btnP1 = document.getElementById('btn-p1');
-
-  setTimeout(()=>{num8.classList.add('visible');},200);
-  setTimeout(()=>{descenso.style.opacity='1';},1800);
-  setTimeout(()=>{finalH.style.opacity='1';},3000);
-  setTimeout(()=>{btnP1.style.opacity='1';},4200);
+function initP1(){
+  setTimeout(function(){document.getElementById('num8').classList.add('visible');},200);
+  setTimeout(function(){document.getElementById('descenso-wrap').style.opacity='1';},2000);
+  setTimeout(function(){document.getElementById('final-historia').style.opacity='1';},3400);
+  setTimeout(function(){document.getElementById('btn-p1').style.opacity='1';},4600);
 }
 
-// ── PANTALLA 2: preguntas aparecen solas ─────────────
-function inicioPantalla2(){
-  const preguntas = document.querySelectorAll('#p2 .pregunta');
-  const btn = document.getElementById('btn-p2');
-
-  preguntas.forEach(p=>{
-    const delay = parseInt(p.dataset.delay)||0;
-    setTimeout(()=>{
+function initP2(){
+  var preguntas=document.querySelectorAll('#p2 .pregunta');
+  var btn=document.getElementById('btn-p2');
+  preguntas.forEach(function(p){
+    var delay=parseInt(p.dataset.delay)||0;
+    setTimeout(function(){
       p.classList.add('visible');
-      // Resaltar la activa
-      preguntas.forEach(q=>q.classList.remove('activa-preg'));
+      preguntas.forEach(function(q){q.classList.remove('activa-preg');});
       p.classList.add('activa-preg');
-    }, delay+400);
+    },delay+400);
   });
-
-  const lastDelay = Math.max(...Array.from(preguntas).map(p=>parseInt(p.dataset.delay)||0));
-  setTimeout(()=>{
-    btn.style.opacity='1';
-  }, lastDelay+1200);
+  var last=Math.max.apply(null,Array.from(preguntas).map(function(p){return parseInt(p.dataset.delay)||0;}));
+  setTimeout(function(){btn.style.opacity='1';},last+1400);
 }
 
-// ── PANTALLA 5: timer ────────────────────────────────
-function inicioPantalla5(){
-  const display = document.getElementById('tiempo-display');
-  const minutos = ((Date.now()-tiempoInicio)/60000).toFixed(1);
-  display.textContent = minutos;
+function initP5(){
+  var min=((Date.now()-tiempoInicio)/60000).toFixed(1);
+  document.getElementById('tiempo-display').textContent=min;
 }
 
-// ── INIT ─────────────────────────────────────────────
-actualizarProgreso(0);
+// INIT
+setTimeout(function(){
+  document.getElementById('num-inicio').classList.add('visible');
+  document.querySelectorAll('#p0 .reveal-item').forEach(function(el,i){
+    setTimeout(function(){el.classList.add('show');},400+i*150);
+  });
+  setTimeout(function(){playAudio('p0');},800);
+},300);
+actualizarProgreso('p0');
 </script>
 </body>
 </html>
