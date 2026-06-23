@@ -136,13 +136,109 @@ html,body{height:100%;background:#050505;color:#F4EFE6;font-family:'Lato',sans-s
   <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(32px,6vw,64px);font-weight:300;color:#F4EFE6;text-align:center;line-height:1.1">El Sueño<br><em style="color:#C9A84C">Suspendido</em></div>
   <div style="width:1px;height:40px;background:linear-gradient(to bottom,transparent,rgba(201,168,76,0.4),transparent);margin:32px auto"></div>
   <div style="font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(201,168,76,0.5);letter-spacing:2px;animation:pulseIn 2s ease infinite">tocá para comenzar</div>
-  <div style="display:flex;align-items:center;gap:8px;margin-top:28px;opacity:0.35;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round">
-      <path d="M3 18v-6a9 9 0 0118 0v6"/>
-      <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
-    </svg>
-    <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:rgba(201,168,76,0.6);text-transform:uppercase">experiencia con audio</span>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:28px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:rgba(201,168,76,0.3);text-transform:uppercase">experiencia con audio</span>
+    </div>
+    <!-- animación volumen triangulo 5 barras + icono parlante reactivo -->
+    <div style="display:flex;align-items:flex-end;gap:4px;height:28px;position:relative;">
+      <div class="vbar" id="vb1"></div>
+      <div class="vbar" id="vb2"></div>
+      <div class="vbar" id="vb3"></div>
+      <div class="vbar" id="vb4"></div>
+      <div class="vbar" id="vb5"></div>
+      <!-- auricular reactivo al nivel -->
+      <div style="margin-left:8px;margin-bottom:2px;position:relative;width:20px;height:20px;">
+        <!-- apagado -->
+        <svg id="spk-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="1.2" stroke-linecap="round" style="position:absolute;top:0;left:0;transition:opacity 0.4s">
+          <path d="M3 18v-6a9 9 0 0118 0v6"/>
+          <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+        </svg>
+        <!-- medio -->
+        <svg id="spk-mid" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.45)" stroke-width="1.2" stroke-linecap="round" style="position:absolute;top:0;left:0;opacity:0;transition:opacity 0.4s">
+          <path d="M3 18v-6a9 9 0 0118 0v6"/>
+          <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+        </svg>
+        <!-- encendido -->
+        <svg id="spk-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.75)" stroke-width="1.2" stroke-linecap="round" style="position:absolute;top:0;left:0;opacity:0;transition:opacity 0.4s">
+          <path d="M3 18v-6a9 9 0 0118 0v6"/>
+          <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>
+        </svg>
+      </div>
+    </div>
   </div>
+<style>
+.vbar{
+  width:3px;
+  border-radius:0;
+  background:rgba(201,168,76,1);
+  transform-origin:bottom;
+  opacity:0;
+}
+/* alturas base en triángulo — sube de izquierda a derecha */
+#vb1{height:6px;}
+#vb2{height:10px;}
+#vb3{height:15px;}
+#vb4{height:20px;}
+#vb5{height:26px;}
+</style>
+<script>
+(function(){
+  var bars=[
+    document.getElementById('vb1'),
+    document.getElementById('vb2'),
+    document.getElementById('vb3'),
+    document.getElementById('vb4'),
+    document.getElementById('vb5')
+  ];
+  var spkOff=document.getElementById('spk-off');
+  var spkMid=document.getElementById('spk-mid');
+  var spkOn=document.getElementById('spk-on');
+  // alturas base del triángulo
+  var baseH=[6,10,15,20,26];
+  // canon — cada barra se enciende y apaga en secuencia con desfase
+  // desfase entre barras: 0.3s
+  var DESFASE=0.35;
+  var CICLO=2.2; // duración de un ciclo completo en segundos
+  var startTime=null;
+
+  function animVol(ts){
+    if(!startTime) startTime=ts;
+    var elapsed=(ts-startTime)/1000;
+
+    bars.forEach(function(b,i){
+      // cada barra tiene su propia fase en el canon
+      var t=((elapsed - i*DESFASE) % CICLO + CICLO) % CICLO;
+      // sube suave (0→1) en la primera mitad, baja (1→0) en la segunda
+      var fase=t/CICLO;
+      var alpha;
+      if(fase<0.5){
+        // fade in suave
+        alpha=Math.sin(fase*Math.PI)*0.5;
+      } else {
+        // fade out suave
+        alpha=Math.sin(fase*Math.PI)*0.5;
+      }
+      // asegurar que nunca quede nada encendido en el mínimo
+      b.style.opacity=Math.max(alpha,0)+'';
+      b.style.height=baseH[i]+'px';
+    });
+
+    // parlante: nivel global = promedio de las barras
+    var elapsed2=elapsed/CICLO;
+    var nivelGlobal=(Math.sin(elapsed2*Math.PI*2)+1)/2;
+    if(nivelGlobal<0.33){
+      spkOff.style.opacity='0.4';spkMid.style.opacity='0';spkOn.style.opacity='0';
+    } else if(nivelGlobal<0.66){
+      spkOff.style.opacity='0';spkMid.style.opacity='0.4';spkOn.style.opacity='0';
+    } else {
+      spkOff.style.opacity='0';spkMid.style.opacity='0';spkOn.style.opacity='0.4';
+    }
+    requestAnimationFrame(animVol);
+  }
+  requestAnimationFrame(animVol);
+})();
+</script>
 </div>
 <style>@keyframes pulseIn{0%,100%{opacity:0.4;}50%{opacity:1;}}</style>
 
