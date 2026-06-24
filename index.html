@@ -39,7 +39,7 @@ html,body{height:100%;background:#050505;color:#F4EFE6;font-family:'Lato',sans-s
 
 /* PREGUNTAS */
 .pregunta-wrap{display:flex;flex-direction:column;gap:16px;max-width:480px;width:100%;}
-.pregunta{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,23px);font-style:italic;font-weight:300;color:var(--gris);text-align:center;opacity:0;transform:translateY(10px);transition:opacity 0.7s ease,transform 0.7s ease,color 0.4s;}
+.pregunta{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,23px);font-style:italic;font-weight:300;color:var(--gris);text-align:center;opacity:0;transform:translateY(24px);transition:opacity 1.6s ease,transform 1.6s ease,color 0.6s;}
 .pregunta.visible{opacity:1;transform:none;}
 .pregunta.activa-preg{color:var(--blanco);}
 
@@ -247,8 +247,6 @@ html,body{height:100%;background:#050505;color:#F4EFE6;font-family:'Lato',sans-s
 <!-- P0 -->
 <div class="pantalla activa" id="p0">
   <div class="eyebrow reveal-item">Una historia</div>
-  <div class="numero-grande" id="num-inicio">8</div>
-  <div class="linea"></div>
   <p class="subtitulo reveal-item" style="margin-top:0">
     Hubo una vez una persona destinada al fracaso.<br>
     <strong>No porque no pudiera. Sino porque alguien decidió que su máximo era ocho.</strong>
@@ -261,19 +259,34 @@ html,body{height:100%;background:#050505;color:#F4EFE6;font-family:'Lato',sans-s
 <!-- P1 -->
 <div class="pantalla" id="p1">
   <div class="eyebrow">La historia</div>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;max-width:540px;width:100%">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:540px;width:100%">
     <div class="numero-grande" id="num8" style="font-size:clamp(56px,12vw,100px)">8</div>
     <p class="subtitulo" style="margin-top:0;text-align:center">
       Se esforzó día tras día. Alcanzó carreras, trabajos, posesiones.<br>
       Pero siempre era un <strong>ocho</strong>. Nunca su diez.
     </p>
     <div class="linea"></div>
-    <div id="descenso-wrap" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;opacity:0;transition:opacity 1s ease">
-      <span class="numero-tachado">8</span><span style="color:var(--gris2)">→</span>
-      <span class="numero-tachado">6</span><span style="color:var(--gris2)">→</span>
-      <span class="numero-tachado">4</span><span style="color:var(--gris2)">→</span>
-      <span style="font-family:'Cormorant Garamond',serif;font-size:clamp(24px,5vw,48px);font-weight:300;color:var(--oro)">0.5</span>
+
+    <!-- Animación secuencial 10→8→6→4 arranca a los 10s dura 15s -->
+    <div id="seq-nums" style="display:flex;gap:20px;align-items:center;justify-content:center;min-height:60px;">
+      <div class="seq-item" id="sn10">
+        <span class="seq-n">10</span>
+        <div class="seq-line"></div>
+      </div>
+      <div class="seq-item" id="sn8">
+        <span class="seq-n">8</span>
+        <div class="seq-line"></div>
+      </div>
+      <div class="seq-item" id="sn6">
+        <span class="seq-n">6</span>
+        <div class="seq-line"></div>
+      </div>
+      <div class="seq-item" id="sn4">
+        <span class="seq-n">4</span>
+        <div class="seq-line"></div>
+      </div>
     </div>
+
     <p class="subtitulo" id="final-historia" style="margin-top:0;opacity:0;transition:opacity 1s ease">
       No porque no pudiera más.<br>Sino porque dejó de decidir que podía.
     </p>
@@ -283,16 +296,53 @@ html,body{height:100%;background:#050505;color:#F4EFE6;font-family:'Lato',sans-s
   </div>
 </div>
 
+<style>
+.seq-item{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  transition:opacity 1.5s ease;
+}
+.seq-item.show{opacity:1;}
+.seq-n{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(36px,8vw,64px);
+  font-weight:300;
+  color:rgba(244,239,230,0.12);
+  transition:color 1.2s ease;
+  position:relative;
+}
+.seq-item.tachado .seq-n{
+  color:rgba(201,168,76,0.6);
+}
+.seq-line{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scaleX(0);
+  width:110%;
+  height:1.5px;
+  background:var(--oro);
+  transform-origin:left center;
+  transition:transform 0.5s ease;
+}
+.seq-item.tachado .seq-line{
+  transform:translate(-50%,-50%) scaleX(1);
+}
+</style>
+
 <!-- P2 -->
 <div class="pantalla" id="p2">
   <div class="eyebrow">Y vos</div>
   <div class="pregunta-wrap" id="preguntas-wrap">
     <p class="pregunta" data-delay="0">¿En dónde estás vos?</p>
-    <p class="pregunta" data-delay="700">¿Cuál es tu máximo?</p>
-    <p class="pregunta" data-delay="1400">¿Cuándo dejaste de soñar?</p>
-    <p class="pregunta" data-delay="2100">¿Cuándo dejaste de buscar?</p>
-    <p class="pregunta" data-delay="2800">¿Por qué decidiste que ya no podías?</p>
-    <p class="pregunta" data-delay="3600" style="color:var(--oro)">¿Quién puso esa voz dentro tuyo?</p>
+    <p class="pregunta" data-delay="2000">¿Cuál es tu máximo?</p>
+    <p class="pregunta" data-delay="4000">¿Cuándo dejaste de soñar?</p>
+    <p class="pregunta" data-delay="6000">¿Cuándo dejaste de buscar?</p>
+    <p class="pregunta" data-delay="8000">¿Por qué decidiste que ya no podías?</p>
+    <p class="pregunta" data-delay="10000" style="color:var(--oro)">¿Quién puso esa voz dentro tuyo?</p>
   </div>
   <div id="btn-p2" style="opacity:0;transition:opacity 0.8s ease;margin-top:24px">
     <div class="eleccion-wrap" style="margin-top:0">
@@ -594,7 +644,7 @@ var audioActual=null;
 
 // Mapeo pantalla → archivo de audio
 var audioMap={
-  'p0':null,'p1':'audio01','p2':'audio02',
+  'p0':'audio01','p1':'audio02','p2':'audio03',
   'pno2':'audio05','pno2b':'audio06',
   'p3':'audio04','pno3':'audio08','p4':'audio07',
   'pno4':'audio08','p5':'audio09','p6':'audio10',
@@ -681,9 +731,30 @@ function ir(id){
 
 function initP1(){
   setTimeout(function(){document.getElementById('num8').classList.add('visible');},200);
-  setTimeout(function(){document.getElementById('descenso-wrap').style.opacity='1';},2000);
-  setTimeout(function(){document.getElementById('final-historia').style.opacity='1';},3400);
-  setTimeout(function(){document.getElementById('btn-p1').style.opacity='1';},4600);
+
+  // Animación secuencial 10→8→6→4
+  // Arranca a los 10s, cada número dura ~3.75s (15s total / 4 números)
+  var ids=['sn10','sn8','sn6','sn4'];
+  var inicio=5000; // 5 segundos
+  var duracion=15000; // 15 segundos total
+  var paso=duracion/ids.length; // 3750ms por número
+
+  ids.forEach(function(id,i){
+    // aparecer
+    setTimeout(function(){
+      var el=document.getElementById(id);
+      if(el) el.classList.add('show');
+    }, inicio + i*paso);
+    // tachar y dorar
+    setTimeout(function(){
+      var el=document.getElementById(id);
+      if(el) el.classList.add('tachado');
+    }, inicio + i*paso + paso*0.5);
+  });
+
+  // texto final y botón después de la animación
+  setTimeout(function(){document.getElementById('final-historia').style.opacity='1';},inicio+duracion+500);
+  setTimeout(function(){document.getElementById('btn-p1').style.opacity='1';},inicio+duracion+1500);
 }
 
 function initP2(){
@@ -708,7 +779,7 @@ function initP5(){
 
 // INIT
 setTimeout(function(){
-  document.getElementById('num-inicio').classList.add('visible');
+  // sin numero en p0
   document.querySelectorAll('#p0 .reveal-item').forEach(function(el,i){
     setTimeout(function(){el.classList.add('show');},400+i*150);
   });
